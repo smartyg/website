@@ -13,6 +13,8 @@ abstract class Theme
 	{
 	}
 
+	abstract public function addMessage(\Exception $messages) : void;
+	abstract public function getNumberSides() : int;
 	abstract public function getJS() : array;
 	abstract public function getStylesheets() : array;
 	abstract public function output(string $article, string $navigation, array $sides = null) : string;

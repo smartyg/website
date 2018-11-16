@@ -9,6 +9,7 @@ use Framework\Theme;
 use Framework\Meta;
 use Framework\Query;
 use Framework\Permissions;
+use Framework\Userdata;
 use \PDO;
 
 /** Main class for which contains all api calls.
@@ -42,13 +43,22 @@ final class Api extends Permissions
 	public function getRelatedArticles(string $tags = "") : array
 	{
 		if($this->checkPerms())
-			return array();
+		{
+			
+		}
 	}
 	
 	public function getSubArticles(int $id = 0) : array
 	{
 		if($this->checkPerms())
-			return array(1 => array('id' => 1, 'title' => 'een titel'));
+		{
+			$r = $this->query->getSubArticles($id, $this->session->getPermissions());
+			foreach($r as $v)
+			{
+				$ret[] = $v['id'];
+			}
+			return $ret;
+		}
 	}
 		
 	public function getArticle(int $id) : array
@@ -56,7 +66,7 @@ final class Api extends Permissions
 		if($this->checkPerms())
 		{
 			$r['id'] = $id;
-			$r['content'] = $this->query->getArticle($id);
+			$r['content'] = $this->query->getArticle($id, $this->session->getPermissions());
 			$r['meta'] = $this->getArticleMeta($id);
 			$r['title'] = $r['meta']->title;
 			return $r;
@@ -67,7 +77,17 @@ final class Api extends Permissions
 	{
 		if($this->checkPerms())
 		{
-			return new Meta($this->query->getArticleMeta($id));
+			$tags = $this->query->getArticleTags($id, $this->session->getPermissions());
+			return new Meta($this->query->getArticleMeta($id, $this->session->getPermissions()));
+		}
+	}
+	
+	public function getSideArticles(int $id) : array
+	{
+		if($this->checkPerms())
+		{
+			$sides = $this->query->getSideArticles($id, $this->session->getPermissions());
+			return explode(',', $sides);
 		}
 	}
 	
@@ -85,7 +105,11 @@ final class Api extends Permissions
 	
 	public function getTheme() : Theme
 	{
-		return new \Theme\DefaultTheme();
+		$value = $this->query->getSettingValue('theme');
+		$class = "\Theme\\" . $value;
+
+		if(class_exists($class, true) && is_subclass_of($class, '\Framework\Theme')) return new $class();
+		else throw new Exception("Theme class " . $class . " does not exists.");
 	}
 	
 	public function getAllThemes() : array
@@ -94,6 +118,11 @@ final class Api extends Permissions
 	
 	public function getAdminTheme() : Theme
 	{
+		$value = $this->query->getSettingValue('admin_theme');
+		$class = "\Theme\\" . $value;
+
+		if(class_exists($class, true) && is_subclass_of($class, '\Framework\Theme') && is_subclass_of($class, '\Framework\iAdminTheme')) return new $class();
+		else throw new Exception("Admin theme class " . $class . " does not exists.");
 	}
 	
 	public function getAllAdminThemes() : array
@@ -130,6 +159,38 @@ final class Api extends Permissions
 	
 	public function changeArticle(int $id, string $article, Meta $meta) : bool
 	{
+	}
+	
+	public function checkPassword(string $username, string $password) : bool
+	{
+		if($this->checkPerms(Constants::_API_PREM_ONLY_FRAMEWORK))
+		{
+			if(($check = $this->query->getPassword($username)) == null) return false;
+			if(password_verify($password, $check) === true) return true;
+			return false;
+			
+		}
+		else throw new Exception("You can not call this function.");
+	}
+
+	public function getUserdata(string $username) : Userdata
+	{
+		if($this->checkPerms(Constants::_API_PREM_ONLY_FRAMEWORK))
+		{
+			if(is_array(($u = $this->query->getUserdata($username)))) return new Userdata($u);
+			
+		}
+		else throw new Exception("You can not call this function.");
+	}
+	
+	public function getUserdataById(int $id) : Userdata
+	{
+		if($this->checkPerms(Constants::_API_PREM_ONLY_FRAMEWORK))
+		{
+			if(is_array(($u = $this->query->getUserdataById($id)))) return new Userdata($u);
+			
+		}
+		else throw new Exception("You can not call this function.");
 	}
 }
 

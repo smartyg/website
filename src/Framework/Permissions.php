@@ -28,8 +28,21 @@ abstract class Permissions
 		else $r = true;
 		
 		if(self::hasBitSet($req, Constants::_API_PREM_ADMIN))
-			if(!$this->session->isAdmin()) $r = false;
-		//if($req & _API_PREM_WRITE && !$this->session->isAdmin()) $r = false;
+			if(!$this->session->isAdmin()) return false;
+		if(self::hasBitSet($req, Constants::_API_PREM_ONLY_FRAMEWORK))
+		{
+			// check that the n-th function before is part of the Framework namespace.
+			$call = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 4);
+
+			if(array_key_exists(1, $call) && array_key_exists('class', $call[1]) && $call[1]['class'] == 'Framework\Query')
+			{
+				if(!(array_key_exists(3, $call) && array_key_exists('class', $call[3]) && $call[3]['class'] == 'Framework\Session')) return false;
+			}
+			if(array_key_exists(1, $call) && array_key_exists('class', $call[1]) && $call[1]['class'] == 'Framework\Api')
+			{
+				if(!(array_key_exists(2, $call) && array_key_exists('class', $call[2]) && $call[2]['class'] == 'Framework\Session')) return false;
+			}
+		}
 		return $r;
 	}
 	

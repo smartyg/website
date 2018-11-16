@@ -20,7 +20,7 @@ final class Session
 	private bool $is_valid = false;
 	private Settings $settings = null;
 */
-	public static $saved_vars = array('is_admin', 'started_time', 'current_article');
+	public static $saved_vars = array('is_admin', 'started_time', 'current_article', 'user_id');
 	private $api = null;
 	private $buffer_started = false;
 	private $is_admin = false;
@@ -29,6 +29,8 @@ final class Session
 	private $settings = null;
 	private $use_buffer = true;
 	private $current_article = 1;
+	private $userdata = null;
+	private $user_id;
 
 	/** Constructor to initialize the class.
 	 * Initialize the Session class.
@@ -48,6 +50,7 @@ final class Session
 			$this->load($_SESSION[Constants::_SESSION_SAVE_ID]);
 		}
 		if($this->started_time < 0) $this->started_time = $_SERVER['REQUEST_TIME'];
+		if(empty($this->user_id)) $this->user_id = 0;
 
 		$this->settings = new Settings();
 
@@ -55,8 +58,10 @@ final class Session
 		$this->is_valid = true;
 
 		$this->api = new Api\Api($this);
+		
+		$this->userdata = $this->api->getUserdataById($this->user_id);
 	}
-	
+
 	/**
 	 * Destructor to save and cleanup the current session. All buffered output is discarded, in case the buffered output has to been written to the client call \ref Api::bufferFlush() first.
 	 */
@@ -72,7 +77,22 @@ final class Session
 		}
 		*/
 	}
-	
+
+	public function login(string $username, string $password) : void
+	{
+		if($this->api->checkPassword($username, $password))
+			$this->userdata = $this->api->getUserdata($username);
+		else throw new Exception("Login Failed.");
+	}
+
+	public function logoff() : void
+	{
+		session_destroy();
+		$this->user_id = 0;
+		$this->userdata = $this->api->getUserdataById($this->user_id);
+		$this->started_time = $_SERVER['REQUEST_TIME'];
+	}
+
 	public function getArticleId() : int
 	{
 		return $this->current_article;	
@@ -99,7 +119,7 @@ final class Session
 	{
 		foreach(self::$saved_vars as $var)
 		{
-			$this->{$var} = $data[$var];
+			if(isset($data[$var])) $this->{$var} = $data[$var];
 		}
 	}
 	
@@ -141,19 +161,17 @@ final class Session
 	 */
 	public function isAdmin() : bool
 	{
+	/* TODO: link this to the user permissions */
 		return ($this->is_valid && $this->is_admin);
-	}
-	
-	/** execute a query on the database backend.
-	 * @param $q	A Query object
-	 */
-	public function query(Query $q)
-	{
-		
 	}
 	
 	private function connectDB()
 	{
+	}
+	
+	public function getPermissions() : int
+	{
+		if($this->userdata->isValid()) return $this->userdata->getPermissions();
 	}
 }
 

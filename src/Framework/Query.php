@@ -33,8 +33,26 @@ final class Query extends Permissions
 	function __construct(Session $session, PDO $dbh)
 	{
 		$this->methods = array(
-			'getArticle' => new Q('SELECT content FROM articles WHERE id == ?', 1, Constants::_QUERY_RETURN_SINGLE_VALUE, Constants::_API_PREM_NO),
-			'getArticleMeta' => new Q('SELECT * FROM articles WHERE id == ?', 1, Constants::_QUERY_RETURN_SINGLE_ROW, Constants::_API_PREM_NO)
+			'getArticle' => new Q('SELECT articles.content as content FROM articles WHERE articles.a_id == ? AND articles.required_permissions == (articles.required_permissions & ?)', 2, Constants::_QUERY_RETURN_SINGLE_VALUE, Constants::_API_PREM_NO),
+			'getArticleMeta' => new Q('SELECT articles.a_id as id, articles.title as title, articles.description as description, articles.date_created as date_created, articles.date_modified as date_modified, users.display_name as display_name, users.u_id as u_id FROM articles INNER JOIN users ON articles.u_id = users.u_id WHERE articles.a_id == ? AND articles.required_permissions == (articles.required_permissions & ?)', 2, Constants::_QUERY_RETURN_SINGLE_ROW, Constants::_API_PREM_NO),
+			'getSubArticles' => new Q('SELECT articles.a_id as id FROM articles INNER JOIN users ON articles.u_id = structure.p_id WHERE structure.a_id == ? AND articles.required_permissions == (articles.required_permissions & ?)', 2, Constants::_QUERY_RETURN_ARRAY, Constants::_API_PREM_NO),
+			'getSideArticles' => new Q('SELECT GROUP_CONCAT(articlesSide.a_id) as sides FROM articles LEFT JOIN sidesMap ON articles.a_id = sidesMap.a_id LEFT JOIN articles as articlesSide ON sidesMap.s_id = articlesSide.a_id WHERE articles.a_id == ? AND articlesSide.required_permissions == (articlesSide.required_permissions & ?) GROUP BY articles.a_id', 2, Constants::_QUERY_RETURN_SINGLE_VALUE, Constants::_API_PREM_NO),
+			
+			'getArticleTags' => new Q('SELECT GROUP_CONCAT(tagsMap.t_id) as tags FROM tagsMap WHERE tagsMap.a_id == ? GROUP BY tagsMap.a_id', 1, Constants::_QUERY_RETURN_SINGLE_VALUE, Constants::_API_PREM_NO),
+			
+			'getArticlesByTags' => new Q('SELECT articles.a_id as id, articles.title as title, articles.description as description FROM tagsMap INNER JOIN articles ON tagsMap.a_id = articles.a_id WHERE tagsMap.t_id IN (?) AND articles.required_permissions == (articles.required_permissions & ?)', 2, Constants::_QUERY_RETURN_ARRAY, Constants::_API_PREM_NO),
+			
+			'getArticlesByTag' => new Q('SELECT articles.a_id as id, articles.title as title, articles.description as description FROM tagsMap INNER JOIN articles ON tagsMap.a_id = articles.a_id WHERE tagsMap.t_id == ? AND articles.required_permissions == (articles.required_permissions & ?)', 2, Constants::_QUERY_RETURN_ARRAY, Constants::_API_PREM_NO),
+			
+			'getNumberOfArticlesByTag' => new Q('SELECT tags.t_id as id, tags.tag as tag, COUNT(articles.a_id) as number FROM tags LEFT JOIN tagsMap ON tags.t_id = tagsMap.t_id LEFT JOIN articles ON tagsMap.a_id = articles.a_id WHERE articles.required_permissions == (articles.required_permissions & ?) GROUP BY tags.t_id, tags.tags', 1, Constants::_QUERY_RETURN_ARRAY, Constants::_API_PREM_NO),
+			
+			'getSettingValue' => new Q('SELECT value FROM settings WHERE name = ?', 1, Constants::_QUERY_RETURN_SINGLE_VALUE, Constants::_API_PREM_NO),
+			
+			'getPassword' => new Q('SELECT password.password as password FROM password INNER JOIN users ON password.u_id = users.u_id WHERE email_address = ?', 1, Constants::_QUERY_RETURN_SINGLE_VALUE, Constants::_API_PREM_ONLY_FRAMEWORK),
+			
+			'getUserdata' => new Q('SELECT u_id, first_name, middle_name, last_name, display_name, email_address, permissions FROM users WHERE email_address = ?', 1, Constants::_QUERY_RETURN_SINGLE_ROW, Constants::_API_PREM_ONLY_FRAMEWORK),
+			
+			'getUserdataById' => new Q('SELECT u_id, first_name, middle_name, last_name, display_name, email_address, permissions FROM users WHERE u_id = ?', 1, Constants::_QUERY_RETURN_SINGLE_ROW, Constants::_API_PREM_ONLY_FRAMEWORK)
 			);
 
 		if($session->isValid())
