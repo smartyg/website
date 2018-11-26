@@ -41,6 +41,11 @@ final class Page
 		if(!$meta->isValid()) throw new Exception("no title given.");
 		else $this->meta = $meta;
 	}
+	
+	public function addMessage(Throwable $e) : void
+	{
+		$this->theme->addMessage($e);
+	}
 
 	public function output() : void
 	{
@@ -66,6 +71,7 @@ final class Page
 
 		echo '</head><body>';
 		echo $this->theme->output($this->article, $this->navigation, $this->sides);
+		if(!$this->theme->messagesPrinted()) $this->theme->printMessages();
 		echo '</body></html>';
 	}
 }

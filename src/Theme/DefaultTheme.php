@@ -21,11 +21,6 @@ class DefaultTheme extends \Framework\Theme implements \Framework\iAdminTheme
 		return 2;
 	}
 	
-	public function addMessage(\Exception $messages) : void
-	{
-		$this->messages = $messages;
-	}
-	
 	public function output(string $article, string $navigation, array $sides = null) : string
 	{
 		$html = '';
