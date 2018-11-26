@@ -6,10 +6,11 @@
          convertNoticesToExceptions="true"
          convertWarningsToExceptions="true"
          processIsolation="false"
-         stopOnFailure="false">
-    <testsuites>
-        <testsuite name="Unit">
-            <directory suffix="Test.php">./tests</directory>
-        </testsuite>
-    </testsuites>
+         stopOnFailure="false"
+		 bootstrap="./tests/libraries/bootstrap.php">
+	<testsuites>
+		<testsuite name="Unit">
+			<directory suffix="Test.php">./tests/tests</directory>
+		</testsuite>
+	</testsuites>
 </phpunit>

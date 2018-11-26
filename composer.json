@@ -1,0 +1,12 @@
+{
+	"minimum-stability": "dev",
+	"name": "smartyg/website",
+	"description": "Framework for a website based on PHP, JS, Ajax",
+	"keywords": [ "webste","framework" ],
+	"license": "GPL-3+",
+    
+	"require-dev":
+	{
+		"phpunit/dbunit": "^4.0"
+	}
+}

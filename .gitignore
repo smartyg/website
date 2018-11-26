@@ -3,3 +3,5 @@ src/config.inc
 src/test.php
 src/website.db
 database.sql
+vendor/
+composer.lock
