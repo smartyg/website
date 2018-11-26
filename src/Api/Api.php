@@ -23,13 +23,13 @@ final class Api extends Permissions
 	 * Initialize the Api class.
 	 * @param $session		instance of the current \ref Session class which controls the rights of the active session.
 	 */
-	public function __construct(Session $session)
+	public function __construct(Session $session, PDO $dbh)
 	{
 		if($session->isValid()) $this->session = $session;
 		else throw new Exception("No valid session is active, API not availible.");
 		
 		//$settings = $this->session->getSettings();
-		$this->query = new Query($this->session, new PDO('sqlite:website.db'));
+		$this->query = new Query($this->session, $dbh);
 	}
 	
 	/**
@@ -38,6 +38,7 @@ final class Api extends Permissions
 	public function __destruct()
 	{
 		unset($this->session);
+		unset($this->query);
 	}
 	
 	public function getRelatedArticles(string $tags = "") : array
@@ -191,6 +192,28 @@ final class Api extends Permissions
 			
 		}
 		else throw new Exception("You can not call this function.");
+	}
+	
+	public function login(string $username, string $password) : bool
+	{
+		if($this->checkPerms() && $this->session->isValid())
+		{
+			try
+			{
+				$this->session->logon($username, $password);
+			}
+			catch(LoginException $e)
+			{
+				return false;
+			}
+			return true;
+		}
+	}
+	
+	public function logoff() : bool
+	{
+		if($this->session->isValid()) $this->session->logoff();
+		return true;
 	}
 }
 

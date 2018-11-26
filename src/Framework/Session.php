@@ -41,7 +41,7 @@ final class Session
 	 * @param $type				allows _SESSION_NEW and _SESSION_NO_NEW
 	 * @param $output_callback	define an additional output callback function
 	 */
-	public function __construct(int $type = self::_SESSION_NEW, bool $use_buffer = true, callable $output_callback = null)
+	public function __construct(int $type = self::_SESSION_NEW, bool $use_buffer = true, callable $output_callback = null, string $config_file = Settings::_CONFIG_FILE)
 	{
 		if($output_callback == null && ini_get("lib.output_compression") == 0) $output_callback = "ob_gzhandler";
 		$this->use_buffer = $use_buffer;
@@ -56,12 +56,12 @@ final class Session
 		if($this->started_time < 0) $this->started_time = $_SERVER['REQUEST_TIME'];
 		if(empty($this->user_id)) $this->user_id = 0;
 
-		$this->settings = new Settings();
+		$this->settings = new Settings($config_file);
 
 		// Set this variable before creating an Api instance, because the Api class will check if this instance is valid by a call to Api::isValid().
 		$this->is_valid = true;
 
-		$this->api = new Api\Api($this);
+		$this->api = new Api\Api($this, $this->connectDB());
 		
 		$this->userdata = $this->api->getUserdataById($this->user_id);
 	}
@@ -169,8 +169,10 @@ final class Session
 		return ($this->is_valid && $this->is_admin);
 	}
 	
-	private function connectDB()
+	private function connectDB() : PDO
 	{
+		$db = $this->settings->getSettingValue("db");
+		if($db != null) return new PDO($db);
 	}
 	
 	public function getPermissions() : int
