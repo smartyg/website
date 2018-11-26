@@ -13,7 +13,8 @@ use Framework\Userdata;
 use \PDO;
 
 /** Main class for which contains all api calls.
- * This class contains all api function calls. To use this class it must be linked to a valid instance of a \ref Session class
+ * This class contains all api function calls. To use this class it must be linked to a valid instance of a \ref Session class and given a backend database handler.
+ * Before a Api call is executed the current permissions will be checked to see if this api call is allowed. If this fails a PermissionException is thrown.
  */
 final class Api extends Permissions
 {
@@ -21,14 +22,17 @@ final class Api extends Permissions
 
 	/** Constructor to initialize the class.
 	 * Initialize the Api class.
-	 * @param $session		instance of the current \ref Session class which controls the rights of the active session.
+	 * @param $session	Instance of the current \ref Session class which controls the permissions of the active session.
+	 * @param $dbh		Instance of a PDO database handler.
+	 * @exception		Throws a \ref SessionException in case no valid session was given.
 	 */
 	public function __construct(Session $session, PDO $dbh)
 	{
+		// Check if we were given a valid session, otherwise throw a session exception.
 		if($session->isValid()) $this->session = $session;
 		else throw new SessionException(SessionException::_NO_VALID_SESSION);
 		
-		//$settings = $this->session->getSettings();
+		// Create an instance of the Query class to handle all the backend database queries.
 		$this->query = new Query($this->session, $dbh);
 	}
 	
@@ -37,7 +41,9 @@ final class Api extends Permissions
 	 */
 	public function __destruct()
 	{
+		// Unset the link to the session instance, so garbage collector can do it's work properly.
 		unset($this->session);
+		// Also remove the link to the Query instance for the garbage collector.
 		unset($this->query);
 	}
 	

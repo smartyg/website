@@ -9,19 +9,11 @@ use Framework\Exceptions\{LoginException, SessionException};
 use \PDO;
 
 /** Main class for managing a user session.
- *
+ * This class is the core of the framework, it manage the active session and attached permissions.
+ * An active session is needed in order for Api calls to succeeded. It's behaviour is determined by both constructor options and settings.
  */
 final class Session
 {
-/* for PHP 7.4
-	public static array $saved_vars = array('is_admin', 'started_time');
-	private Api\Api $api = null;
-	private bool $buffer_started = false;
-	private bool $is_admin = false;
-	private int $started_time = -1;
-	private bool $is_valid = false;
-	private Settings $settings = null;
-*/
 	const _SESSION_NEW = 0x1;
 	const _SESSION_NO_NEW = 0x2;
 	const _SESSION_SAVE_ID = __NAMESPACE__ . '\ID';
@@ -42,6 +34,7 @@ final class Session
 	 * Initialize the Session class.
 	 * @param $type				allows _SESSION_NEW and _SESSION_NO_NEW
 	 * @param $output_callback	define an additional output callback function
+	 * @exception				throws a SessionException if failed to start a session.
 	 */
 	public function __construct(int $type = self::_SESSION_NEW, bool $use_buffer = true, callable $output_callback = null, string $config_file = Settings::_CONFIG_FILE)
 	{
@@ -60,6 +53,7 @@ final class Session
 		}
 		elseif(isset($_SESSION[self::_SESSION_SAVE_ID]))
 		{
+			// Previous session information was found, try to read it.
 			$this->load($_SESSION[self::_SESSION_SAVE_ID]);
 		}
 		if($this->started_time < 0) $this->started_time = $_SERVER['REQUEST_TIME'];
@@ -73,6 +67,7 @@ final class Session
 		// Get an instance of the Api class and pass this session as argument, so it will uses our premissions to execute calls. As we did not yet retreive the user data of the current user id, all permissions will still be zero.
 		$this->api = new Api($this, $this->connectDB());
 		
+		// Now we have an Api, read the user data assoiciated with the current user ID, this includes reading the premissions.
 		$this->userdata = $this->api->getUserdataById($this->user_id);
 	}
 
@@ -81,17 +76,20 @@ final class Session
 	 */
 	public function __destruct()
 	{
+		// Unreference the Api, this will lead trigger the Api destructor and also erease it's reference to our session instance.
 		unset($this->api);
+		// Save the current session before all will go to waist.
 		$this->save();
+		// Stop and clean the output buffer.
 		if($this->use_buffer) ob_end_clean();
-		/*
-		{
-			while(ob_get_level() > 0)
-				ob_end_clean();
-		}
-		*/
 	}
 
+	/** Try to log in with given username and password.
+	 * Try to log in. Username and password are checked against the storage backed. If succeeded then the new user permissions are active immediately.
+	 * @param $username	The username geven by the user.
+	 * @param $password	Password given by the user.
+	 * @exception	Throws a \ref LoginException if logging in fails.
+	 */
 	public function login(string $username, string $password) : void
 	{
 		if($this->api->checkPassword($username, $password))
@@ -99,6 +97,9 @@ final class Session
 		else throw new LoginException(LoginException::_LOGIN_FAILED);
 	}
 
+	/** Log off from a session.
+	 * Loggs off and destroys all session data including used permissions.
+	 */
 	public function logoff() : void
 	{
 		session_destroy();
@@ -107,6 +108,10 @@ final class Session
 		$this->started_time = $_SERVER['REQUEST_TIME'];
 	}
 
+	/** Get current article ID.
+	 * Get the current article ID as stored in the session.
+	 * @return	The article ID as stored in the current session.
+	 */
 	public function getArticleId() : int
 	{
 		return $this->current_article;	
@@ -115,7 +120,7 @@ final class Session
 	/**
 	 * Save the current content of the class instance to the $_SESSION variable.
 	 */
-	private function save()
+	private function save() : void
 	{
 		$s = null;
 		foreach(self::$saved_vars as $var)
@@ -139,7 +144,7 @@ final class Session
 	
 	/**
 	 * Return the associative instance of the api for this session.
-	 * @return	An instance of the Api class for this array.
+	 * @return	An instance of the Api class for this session.
 	 */
 	public function getApi() : object
 	{
@@ -179,12 +184,20 @@ final class Session
 		return ($this->is_valid && $this->is_admin);
 	}
 	
+	/** Connect to backend database.
+	 * This function reads the database settings from the settings file, connects to the database and return the connection handler.
+	 * @return	A valid connection handler.
+	 */
 	private function connectDB() : PDO
 	{
 		$db = $this->settings->getSettingValue("db");
 		if($db != null) return new PDO($db);
 	}
 	
+	/** Get current sessions permissions.
+	 * Get the permissions of the current active session.
+	 * @return	An integer which holds all the active permissions bits.
+	 */
 	public function getPermissions() : int
 	{
 		if($this->userdata->isValid()) return $this->userdata->getPermissions();
