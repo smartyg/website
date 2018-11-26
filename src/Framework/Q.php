@@ -14,7 +14,7 @@ final class Q
 	public $options;
 	public $permissions;
 	
-	function __construct(string $query, int $n, int $options = 0, int $permissions = constants::_API_PREM_NO)
+	function __construct(string $query, int $n, int $options = 0, int $permissions = Permissions::_PREM_NO)
 	{
 		$this->query = $query;
 		$this->n = $n;

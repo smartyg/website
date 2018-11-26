@@ -4,22 +4,14 @@ declare(strict_types = 1);
 
 require_once("./autoload.php");
 
++use Framework\Session;
+use Framework\Utils; 
 try
 {
-	$session = new Session::Session(\Framework\Constants::NO_NEW_SESSION);
+	$session = new Session::Session(Session::NO_NEW_SESSION);
 }
 
-function api_parse_text($a) : string
-{
-}
 
-function api_parse_json($a) : string
-{
-}
-
-function api_parse_xml($a) : string
-{
-}
 
 function api_call(string $fn, string $args_type, string $return_type = _RETURN_TEXT)
 {
@@ -49,18 +41,18 @@ function api_call(string $fn, string $args_type, string $return_type = _RETURN_T
 	switch($return_type)
 	{
 		case _RETURN_TEXT:
-			return api_parse_text($res);
+			return Utils::apiParseText($res);
 		case _RETURN_JSON:
-			return api_parse_json($res);
+			return Utils::apiParseJson($res);
 		case _RETURN_XML:
-			return api_parse_xml($res);
+			return Utils::apiParseXml($res);
 	}
 
 }
 
-$fn = parse_global_var($_GET, '');
-$args_type = parse_global_var($_GET, '');
-$return_type = parse_global_var($_GET, '');
+	$fn = Utils::parseGlobalVar($_GET, 'q');
+	$args_type = Utils::parseGlobalVar($_GET, 'a');
+	$return_type = Utils::parseGlobalVar($_GET, 'r');
 
 $session->buffer_clean();
 

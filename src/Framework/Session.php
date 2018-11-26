@@ -20,6 +20,10 @@ final class Session
 	private bool $is_valid = false;
 	private Settings $settings = null;
 */
+	const _SESSION_NEW = 0x1;
+	const _SESSION_NO_NEW = 0x2;
+	const _SESSION_SAVE_ID = __NAMESPACE__ . '\ID';
+
 	public static $saved_vars = array('is_admin', 'started_time', 'current_article', 'user_id');
 	private $api = null;
 	private $buffer_started = false;
@@ -37,17 +41,17 @@ final class Session
 	 * @param $type				allows _SESSION_NEW and _SESSION_NO_NEW
 	 * @param $output_callback	define an additional output callback function
 	 */
-	public function __construct(int $type = Constants::_SESSION_NEW, bool $use_buffer = true, callable $output_callback = null)
+	public function __construct(int $type = self::_SESSION_NEW, bool $use_buffer = true, callable $output_callback = null)
 	{
 		if($output_callback == null && ini_get("lib.output_compression") == 0) $output_callback = "ob_gzhandler";
 		$this->use_buffer = $use_buffer;
 		if($this->use_buffer) ob_start($output_callback);
 		session_start();
 
-		if(!isset($_SESSION[Constants::_SESSION_SAVE_ID]) && $type == Constants::_SESSION_NO_NEW) throw new Exception("No previous session found");
-		elseif(isset($_SESSION[Constants::_SESSION_SAVE_ID]))
+		if(!isset($_SESSION[self::_SESSION_SAVE_ID]) && $type == self::_SESSION_NO_NEW) throw new Exception("No previous session found");
+		elseif(isset($_SESSION[self::_SESSION_SAVE_ID]))
 		{
-			$this->load($_SESSION[Constants::_SESSION_SAVE_ID]);
+			$this->load($_SESSION[self::_SESSION_SAVE_ID]);
 		}
 		if($this->started_time < 0) $this->started_time = $_SERVER['REQUEST_TIME'];
 		if(empty($this->user_id)) $this->user_id = 0;
@@ -108,7 +112,7 @@ final class Session
 		{
 			$s[$var] = $this->{$var};
 		}
-		$_SESSION[Constants::_SESSION_SAVE_ID] = $s;
+		$_SESSION[self::_SESSION_SAVE_ID] = $s;
 	}
 	
 	/**

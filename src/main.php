@@ -9,7 +9,7 @@ use Framework\Page;
 
 try
 {
-	$session = new Session(\Framework\Constants::_SESSION_NEW, false);
+	$session = new Session(Session::_SESSION_NEW, false);
 	$api = $session->getApi();
 	
 	$page = new Page($api->getTheme());

@@ -163,7 +163,7 @@ final class Api extends Permissions
 	
 	public function checkPassword(string $username, string $password) : bool
 	{
-		if($this->checkPerms(Constants::_API_PREM_ONLY_FRAMEWORK))
+		if($this->checkPerms(self::_PREM_ONLY_FRAMEWORK))
 		{
 			if(($check = $this->query->getPassword($username)) == null) return false;
 			if(password_verify($password, $check) === true) return true;
@@ -175,7 +175,7 @@ final class Api extends Permissions
 
 	public function getUserdata(string $username) : Userdata
 	{
-		if($this->checkPerms(Constants::_API_PREM_ONLY_FRAMEWORK))
+		if($this->checkPerms(self::_PREM_ONLY_FRAMEWORK))
 		{
 			if(is_array(($u = $this->query->getUserdata($username)))) return new Userdata($u);
 			
@@ -185,7 +185,7 @@ final class Api extends Permissions
 	
 	public function getUserdataById(int $id) : Userdata
 	{
-		if($this->checkPerms(Constants::_API_PREM_ONLY_FRAMEWORK))
+		if($this->checkPerms(self::_PREM_ONLY_FRAMEWORK))
 		{
 			if(is_array(($u = $this->query->getUserdataById($id)))) return new Userdata($u);
 			
