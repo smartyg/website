@@ -4,40 +4,39 @@ declare(strict_types = 1);
 
 require_once("./autoload.php");
 
-+use Framework\Session;
-use Framework\Utils; 
-try
-{
-	$session = new Session::Session(Session::NO_NEW_SESSION);
-}
+use Framework\Session;
+use Framework\Utils;
+use Api\Api;
 
+const _ARGS_POST = 'P';
+const _ARGS_GET = 'G';
+const _RETURN_TEXT = 'T';
+const _RETURN_JSON = 'J';
+const _RETURN_XML = 'X';
 
-
-function api_call(string $fn, string $args_type, string $return_type = _RETURN_TEXT)
+function api_call(Api $api, string $fn, string $args_type, string $return_type = _RETURN_TEXT) : string
 {
 	if($args_type == _ARGS_POST) $v = $_POST;
 	else $v = $_GET;
-	
-	try
-	{
-		$method = new ReflectionMethod($session->getApi, $fn);
 
-		foreach($method->getParameters() AS $arg)
-		{
-			if($v[$arg->name]) $args[$arg->name] = $v[$arg->name];
-			//else $args[$arg->name] = null;
-		}
-        
-		if(($res = call_user_func_array(array($session->getApi, $fn), $args)) == null)
-		{
-			throw ...
-		}
-	}
-	catch(Exception $e)
+	$method = new ReflectionMethod($api, $fn);
+//var_dump($method->getParameters());
+	$args = array();
+	foreach($method->getParameters() AS $arg)
 	{
-		$res = "error";
+		if($v[$arg->getName()])
+		{
+			$var = $v[$arg->getName()];
+			settype($var, $arg->getType()->getName());
+			$args[$arg->getName()] = $var;
+		}
 	}
-	
+        
+	if(($res = call_user_func_array(array($api, $fn), $args)) == null)
+	{
+		throw new Exception("wrong function call.");
+	}
+
 	switch($return_type)
 	{
 		case _RETURN_TEXT:
@@ -49,15 +48,24 @@ function api_call(string $fn, string $args_type, string $return_type = _RETURN_T
 	}
 
 }
+/*
+try
+{*/
+	$session = new Session(Session::_SESSION_NO_NEW, false);
 
 	$fn = Utils::parseGlobalVar($_GET, 'q');
 	$args_type = Utils::parseGlobalVar($_GET, 'a');
 	$return_type = Utils::parseGlobalVar($_GET, 'r');
 
-$session->buffer_clean();
+	$session->bufferClean();
 
-echo api_call($fn, $args_type, $return_type);
+	echo api_call($session->getApi(), $fn, $args_type, $return_type);
 
-$session->buffer_end_flush();
-
+	$session->bufferFlush();/*
+}
+catch(Exception | Error $e)
+{
+	echo "error: " . $e->getMessage();
+}
+*/
 ?>
