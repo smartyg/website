@@ -18,7 +18,7 @@ final class Session
 	const _SESSION_NO_NEW = 0x2;
 	const _SESSION_SAVE_ID = __NAMESPACE__ . '\ID';
 
-	public static $saved_vars = array('is_admin', 'started_time', 'current_article', 'user_id');
+	private static $saved_vars = array('is_admin', 'started_time', 'current_article', 'user_id');
 	private $api = null;
 	private $buffer_started = false;
 	private $is_admin = false;
