@@ -6,6 +6,7 @@ require_once("./autoload.php");
 
 use Framework\Session;
 use Framework\Page;
+use Framework\Exceptions\BaseException;
 
 try
 {
@@ -23,7 +24,7 @@ try
 			$page->setSide($i, $api->getSide($session->getArticleId(), $i));
 		}
 	}
-	catch(exception $e)
+	catch(Exception | Error $e)
 	{
 		$page->addMessage($e);
 	}

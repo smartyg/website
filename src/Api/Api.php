@@ -26,7 +26,7 @@ final class Api extends Permissions
 	public function __construct(Session $session, PDO $dbh)
 	{
 		if($session->isValid()) $this->session = $session;
-		else throw new Exception("No valid session is active, API not availible.");
+		else throw new SessionException(SessionException::_NO_VALID_SESSION);
 		
 		//$settings = $this->session->getSettings();
 		$this->query = new Query($this->session, $dbh);

@@ -5,6 +5,7 @@ declare(strict_types = 1);
 namespace Framework;
 
 use Api;
+use Framework\Exceptions\{LoginException, SessionException};
 
 /** Main class for managing a user session.
  *
@@ -48,7 +49,14 @@ final class Session
 		if($this->use_buffer) ob_start($output_callback);
 		session_start();
 
-		if(!isset($_SESSION[self::_SESSION_SAVE_ID]) && $type == self::_SESSION_NO_NEW) throw new Exception("No previous session found");
+		if(!isset($_SESSION[self::_SESSION_SAVE_ID]) && $type == self::_SESSION_NO_NEW)
+		{
+			// As there is no previous session to reuse, as requested by the options, close the output buffer and destroy the session.
+			session_destroy();
+			if($this->use_buffer) ob_end_clean();
+			// Throw a SessionException to indicate that we failed to start a session.
+			throw new SessionException(SessionException::_NO_SESSION_FOUND);
+		}
 		elseif(isset($_SESSION[self::_SESSION_SAVE_ID]))
 		{
 			$this->load($_SESSION[self::_SESSION_SAVE_ID]);
@@ -86,7 +94,7 @@ final class Session
 	{
 		if($this->api->checkPassword($username, $password))
 			$this->userdata = $this->api->getUserdata($username);
-		else throw new Exception("Login Failed.");
+		else throw new LoginException(LoginException::_LOGIN_FAILED);
 	}
 
 	public function logoff() : void
