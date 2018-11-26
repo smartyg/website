@@ -4,8 +4,9 @@ declare(strict_types = 1);
 
 namespace Framework;
 
-use Api;
+use Api\Api;
 use Framework\Exceptions\{LoginException, SessionException};
+use \PDO;
 
 /** Main class for managing a user session.
  *
@@ -69,7 +70,8 @@ final class Session
 		// Set this variable before creating an Api instance, because the Api class will check if this instance is valid by a call to Api::isValid().
 		$this->is_valid = true;
 
-		$this->api = new Api\Api($this, $this->connectDB());
+		// Get an instance of the Api class and pass this session as argument, so it will uses our premissions to execute calls. As we did not yet retreive the user data of the current user id, all permissions will still be zero.
+		$this->api = new Api($this, $this->connectDB());
 		
 		$this->userdata = $this->api->getUserdataById($this->user_id);
 	}
