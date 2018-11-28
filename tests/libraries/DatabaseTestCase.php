@@ -11,10 +11,16 @@ abstract class DatabaseTestCase extends TestCase
 	use TestCaseTrait;
 
 	// only instantiate pdo once for test clean-up/fixture load
-	static private $pdo = null;
+	static protected $pdo = null;
 
 	// only instantiate PHPUnit_Extensions_Database_DB_IDatabaseConnection once per test
 	private $conn = null;
+
+	protected function setUp() : void
+	{
+		// \PHPUnit_Extensions_Database_TestCase uses this for important stuff, so be sure to call it
+		parent::setUp();
+	}
 
 	final public function getConnection()
 	{
