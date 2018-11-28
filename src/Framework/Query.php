@@ -78,7 +78,18 @@ final class Query extends Permissions
 		{
 			if(count($arguments) < $q->n) throw new Exception("Not enough parameters given for query " . $fn . ".");
 
-			if(!array_key_exists($fn, $this->stmt) || $this->stmt[$fn] === null) $this->stmt[$fn] = $this->dbh->prepare($q->query);
+			if(!array_key_exists($fn, $this->stmt) || $this->stmt[$fn] === null || $this->stmt[$fn] === false)
+			{
+				try
+				{
+					if(($this->stmt[$fn] = $this->dbh->prepare($q->query)) === false)
+						throw new Exception($fn . ": Cannot prepare SQL statement: " . $q->query);
+				}
+				catch(PDOException $e)
+				{
+					throw new Exception($fn . ": Cannot prepare SQL statement: " . $q->query, 0, $e);
+				}
+			}
 
 			$stmt = $this->stmt[$fn];
 			for($n = 0; $n < $q->n; $n++)
