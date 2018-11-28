@@ -16,6 +16,7 @@ final class Query extends Permissions
 	const _QUERY_RETURN_SINGLE_VALUE = 1 << 0;
 	const _QUERY_RETURN_SINGLE_ROW = 1 << 1;
 	const _QUERY_RETURN_ARRAY = 1 << 2;
+	const _QUERY_RETURN_NON = 1 << 3;
 
 	private $dbh = null;
 	private $stmt = array();
@@ -94,16 +95,25 @@ final class Query extends Permissions
 			$stmt = $this->stmt[$fn];
 			for($n = 0; $n < $q->n; $n++)
 			{
-				$stmt->bindValue($n + 1, $arguments[$n]);
+				if(!$stmt->bindValue($n + 1, $arguments[$n]))
+					throw new Exception($fn . ": failed to bind argument " . ($n + 1) . ".");
 			}
 
-			$stmt->execute();
-			$res = $stmt->fetchAll(PDO::FETCH_ASSOC);
+			if(!$stmt->execute())
+				throw new Exception($fn . ": failed to execute query: " . $q->query);
 
-			if(self::hasBitSet($q->options, self::_QUERY_RETURN_SINGLE_ROW))
+			if(($res = $stmt->fetchAll(PDO::FETCH_ASSOC)) === false)
+				throw new Exception($fn . ": failed to execute query: " . $q->query);
+
+			if(self::hasBitSet($q->options, self::_QUERY_RETURN_NON))
+			{
+				if(count($res) == 0) return true;
+				else throw new Exception($fn . ": The query returned data while it should not return any.");
+			}
+			elseif(self::hasBitSet($q->options, self::_QUERY_RETURN_SINGLE_ROW))
 			{
 				if(count($res) == 1) return $res[0];
-				else throw new Exception("There are multiple rows in the return array. Review the database statement.");
+				else throw new Exception($fn . ": There are multiple rows in the return array. Review the database statement.");
 			}
 			elseif(self::hasBitSet($q->options, self::_QUERY_RETURN_SINGLE_VALUE))
 			{
@@ -119,14 +129,14 @@ final class Query extends Permissions
 							return $res[0][key($res[0])];
 						}
 					}
-					else throw new Exception("There are multiple values in the return array. Review the database statement.");
+					else throw new Exception($fn . ": There are multiple values in the return array. Review the database statement.");
 				}
-				else throw new Exception("There are multiple rows in the return array. Review the database statement.");
+				else throw new Exception($fn . ": There are multiple rows in the return array. Review the database statement.");
 			}
 			elseif(self::hasBitSet($q->options, self::_QUERY_RETURN_ARRAY))
 			{
 				if(is_array($res)) return $res;
-				else throw new Exception("The result of the query did not return an array. Review the database statement.");
+				else throw new Exception($fn . ": The result of the query did not return an array. Review the database statement.");
 			}
 			else throw new Exception('no return type given for query ' . $fn . '.');
 		}
