@@ -1,12 +1,45 @@
 {
-	"minimum-stability": "dev",
 	"name": "smartyg/website",
 	"description": "Framework for a website based on PHP, JS, Ajax",
 	"keywords": [ "webste","framework" ],
-	"license": "GPL-3+",
-    
+	"license": "GPL-3.0-or-later",
+	"readme": "./README.md",
+	"type": "project",
+	"authors":
+	[
+		{
+			"name": "Martijn Goedhart",
+			"email": "goedhart.martijn@gmail.com",
+			"homepage": "http://www.martijn-goedhart.nl",
+			"role": "Developer"
+		}
+	],
+	"minimum-stability": "stable",
+
+	"autoload":
+	{
+		"psr-4": { "": "src/" }
+	},
+
+	"autoload-dev":
+	{
+		"psr-4": { "": ["tests/tests", "tests/libraries"] }
+	},
+
+	"require":
+	{
+		"php": "^7.1",
+		"ext-pdo": "*",
+		"ext-dom": "*",
+		"ext-json": "*",
+		"ext-libxml": "*"
+	},
+
 	"require-dev":
 	{
+		"ext-uopz": "*",
+		"ext-xdebug": "*",
+		"phpunit/phpunit": "^7.0",
 		"phpunit/dbunit": "^4.0"
 	}
 }

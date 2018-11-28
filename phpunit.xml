@@ -7,7 +7,8 @@
          convertWarningsToExceptions="true"
          processIsolation="false"
          stopOnFailure="false"
-		 bootstrap="./tests/libraries/bootstrap.php">
+         stderr="true"
+         bootstrap="./tests/libraries/bootstrap.php">
 	<testsuites>
 		<testsuite name="Unit">
 			<directory suffix="Test.php">./tests/tests</directory>
