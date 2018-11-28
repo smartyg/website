@@ -11,8 +11,5 @@ matrix:
     - php: nightly
 
 install:
-  - composer install
-
-before_script:
   - sudo pecl install uopz
-  
+  - composer install
