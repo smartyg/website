@@ -14,3 +14,5 @@ matrix:
     - php: '7.1'
     - php: nightly
 
+install:
+  - composer install
