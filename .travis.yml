@@ -10,6 +10,7 @@ matrix:
     - php: '7.1'
     - php: nightly
 
-install:
-  - sudo pecl install uopz
+before_script:
+  - pecl channel-update pecl.php.net
+  - pecl install uopz
   - composer install
