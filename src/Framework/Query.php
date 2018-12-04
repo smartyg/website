@@ -114,8 +114,15 @@ final class Query extends Permissions
 			elseif(self::hasBitSet($q->options, self::_QUERY_RETURN_SINGLE_ROW))
 			{
 				if(count($res) == 1) return $res[0];
-				elseif(count($res) > 1) throw new InternalException($fn . ": There are multiple rows in the return array. Review the database statement.", InternalException::WRONG_NUM_RECORDS_RETURNED);
-				else throw new InternalException($fn . ": There are no rows in the return array. Review the database statement.", InternalException::WRONG_NUM_RECORDS_RETURNED);
+				elseif(count($res) > 1)
+				{
+					throw new InternalException($fn . ": There are multiple rows in the return array. Review the database statement.", InternalException::WRONG_NUM_RECORDS_RETURNED);
+				}
+				else
+				{
+					//if($fn == 'getArticleMeta') $stmt->debugDumpParams();
+					throw new InternalException($fn . ": There are no rows in the return array. Review the database statement.", InternalException::WRONG_NUM_RECORDS_RETURNED);
+				}
 			}
 			elseif(self::hasBitSet($q->options, self::_QUERY_RETURN_SINGLE_VALUE))
 			{
