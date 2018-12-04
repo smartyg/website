@@ -1,1 +1,1 @@
-db = "sqlite:sql_test.db"
+db = "sqlite:./tests/resources/sql_test.db"

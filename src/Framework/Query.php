@@ -6,7 +6,8 @@ namespace Framework;
 
 use \PDO;
 use \PDOStatement;
-use \Exception;
+use Framework\Exceptions\InternalException;
+
 
 /** Class for which contains all database queries.
  * This class contains all the backend database calls. To use this, provide a valid instance of a session object and an valid database connection (PDO).
@@ -65,7 +66,7 @@ final class Query extends Permissions
 			$this->session = $session;
 			$this->dbh = $dbh;
 		}
-		else throw new Exception("No valid session is active, queries not availible.");
+		else throw new InternalException("No valid session is active, queries not availible.", InternalException::NO_VALID_SESSION);
 	}
 
 	/** Helper method for generic query execution.
@@ -73,22 +74,22 @@ final class Query extends Permissions
 	 */
 	public function __call(string $fn, array $arguments = null)
     {
-		if(!array_key_exists($fn, $this->methods)) throw new Exception('Query ' . $fn . ' does not exists.');
+		if(!array_key_exists($fn, $this->methods)) throw new InternalException('Query ' . $fn . ' does not exists.', InternalException::QUERY_NOT_EXISTS);
 		$q = $this->methods[$fn];
 		if($this->checkPerms($q->permissions))
 		{
-			if(count($arguments) < $q->n) throw new Exception("Not enough parameters given for query " . $fn . ".");
+			if(count($arguments) < $q->n) throw new InternalException("Not enough parameters given for query " . $fn . ".", InternalException::WRONG_ARGUMENT_COUNT);
 
 			if(!array_key_exists($fn, $this->stmt) || $this->stmt[$fn] === null || $this->stmt[$fn] === false)
 			{
 				try
 				{
 					if(($this->stmt[$fn] = $this->dbh->prepare($q->query)) === false)
-						throw new Exception($fn . ": Cannot prepare SQL statement: " . $q->query);
+						throw new InternalException($fn . ": Cannot prepare SQL statement: " . $q->query . ".", InternalException::WRONG_SQL);
 				}
 				catch(PDOException $e)
 				{
-					throw new Exception($fn . ": Cannot prepare SQL statement: " . $q->query, 0, $e);
+					throw new InternalException($fn . ": Cannot prepare SQL statement: " . $q->query, InternalException::WRONG_SQL, $e);
 				}
 			}
 
@@ -96,24 +97,25 @@ final class Query extends Permissions
 			for($n = 0; $n < $q->n; $n++)
 			{
 				if(!$stmt->bindValue($n + 1, $arguments[$n]))
-					throw new Exception($fn . ": failed to bind argument " . ($n + 1) . ".");
+					throw new InternalException($fn . ": failed to bind argument " . ($n + 1) . ".", InternalException::FAILED_ARGUMENT_BIND);
 			}
 
 			if(!$stmt->execute())
-				throw new Exception($fn . ": failed to execute query: " . $q->query);
+				throw new InternalException($fn . ": failed to execute query: " . $q->query, InternalException::FAILED_TO_EXECUTE);
 
 			if(($res = $stmt->fetchAll(PDO::FETCH_ASSOC)) === false)
-				throw new Exception($fn . ": failed to execute query: " . $q->query);
+				throw new InternalException($fn . ": failed to execute query: " . $q->query, InternalException::FAILED_TO_FETCH);
 
 			if(self::hasBitSet($q->options, self::_QUERY_RETURN_NON))
 			{
-				if(count($res) == 0) return true;
-				else throw new Exception($fn . ": The query returned data while it should not return any.");
+				if(count($res) == 0 || empty($res)) return true;
+				else throw new InternalException($fn . ": The query returned data while it should not return any.", InternalException::WRONG_NUM_RECORDS_RETURNED);
 			}
 			elseif(self::hasBitSet($q->options, self::_QUERY_RETURN_SINGLE_ROW))
 			{
 				if(count($res) == 1) return $res[0];
-				else throw new Exception($fn . ": There are multiple rows in the return array. Review the database statement.");
+				elseif(count($res) > 1) throw new InternalException($fn . ": There are multiple rows in the return array. Review the database statement.", InternalException::WRONG_NUM_RECORDS_RETURNED);
+				else throw new InternalException($fn . ": There are no rows in the return array. Review the database statement.", InternalException::WRONG_NUM_RECORDS_RETURNED);
 			}
 			elseif(self::hasBitSet($q->options, self::_QUERY_RETURN_SINGLE_VALUE))
 			{
@@ -129,18 +131,19 @@ final class Query extends Permissions
 							return $res[0][key($res[0])];
 						}
 					}
-					else throw new Exception($fn . ": There are multiple values in the return array. Review the database statement.");
+					else throw new InternalException($fn . ": There are multiple values in the return array. Review the database statement.", InternalException::WRONG_NUM_RECORDS_RETURNED);
 				}
-				else throw new Exception($fn . ": There are multiple rows in the return array. Review the database statement.");
+				elseif(count($res) > 1) throw new InternalException($fn . ": There are multiple rows in the return array. Review the database statement.", InternalException::WRONG_NUM_RECORDS_RETURNED);
+				else throw new InternalException($fn . ": There are no rows in the return array. Review the database statement.", InternalException::WRONG_NUM_RECORDS_RETURNED);
 			}
 			elseif(self::hasBitSet($q->options, self::_QUERY_RETURN_ARRAY))
 			{
 				if(is_array($res)) return $res;
-				else throw new Exception($fn . ": The result of the query did not return an array. Review the database statement.");
+				else throw new InternalException($fn . ": The result of the query did not return an array. Review the database statement.", InternalException::WRONG_NUM_RECORDS_RETURNED);
 			}
-			else throw new Exception('no return type given for query ' . $fn . '.');
+			else throw new InternalException('no return type given for query ' . $fn . '.', InternalException::CODE_ERROR);
 		}
-		else throw new Exception("You do not have the right permissions to execute query " . $fn . ".");
+		else throw new InternalException("You do not have the right permissions to execute query " . $fn . ".", InternalException::WRONG_PERMISSION);
     }
 }
 ?>

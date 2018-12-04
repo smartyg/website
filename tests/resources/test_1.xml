@@ -1,7 +1,200 @@
-<?xml version="1.0"?>
-<mysqldump xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-<database name="phpunit_db">
-	<table_data name="users">
-	</table_data>
-</database>
-</mysqldump>
+<?xml version="1.0" ?>
+<dataset>
+    <table name="users">
+        <column>u_id</column>
+        <column>first_name</column>
+        <column>middle_name</column>
+        <column>last_name</column>
+		<column>display_name</column>
+		<column>email_address</column>
+		<column>permissions</column>
+        <row>
+            <value>0</value>
+			<null />
+			<null />
+			<null />
+            <value>public</value>
+			<value>example@example.org</value>
+			<value>0</value>
+        </row>
+        <row>
+            <value>1</value>
+			<value>John</value>
+			<null />
+			<value>Doe</value>
+            <value>John Doe</value>
+			<value>John.Doe@example.org</value>
+			<value>1</value>
+        </row>
+    </table>
+	<table name="permissions">
+        <column>p_id</column>
+        <column>name</column>
+        <column>description</column>
+		<row>
+			<value>0</value>
+			<value>public</value>
+			<value>Everyone can view this</value>
+		</row>
+		<row>
+			<value>1</value>
+			<value>private</value>
+			<value>Only for authorized persons</value>
+		</row>
+	</table>
+	<table name="tags">
+        <column>t_id</column>
+        <column>tag</column>
+		<row>
+			<value>0</value>
+			<value>tag1</value>
+		</row>
+		<row>
+			<value>1</value>
+			<value>tag with spaces</value>
+		</row>
+		<row>
+			<value>2</value>
+			<value>More tags</value>
+		</row>
+		<row>
+			<value>3</value>
+			<value>tag&amp;match</value>
+		</row>
+	</table>
+    <table name="tagsMap">
+        <column>t_id</column>
+        <column>a_id</column>
+		<row>
+			<value>0</value>
+			<value>2</value>
+		</row>
+		<row>
+			<value>2</value>
+			<value>2</value>
+		</row>
+		<row>
+			<value>0</value>
+			<value>0</value>
+		</row>
+		<row>
+			<value>3</value>
+			<value>1</value>
+		</row>
+		<row>
+			<value>3</value>
+			<value>2</value>
+		</row>
+		<row>
+			<value>2</value>
+			<value>3</value>
+		</row>
+		<row>
+			<value>1</value>
+			<value>3</value>
+		</row>
+	</table>
+	<table name="sidesMap">
+        <column>a_id</column>
+        <column>s_id</column>
+	</table>
+    <table name="structure">
+        <column>a_id</column>
+        <column>p_id</column>
+		<row>
+			<value>0</value>
+			<null />
+		</row>
+		<row>
+			<value>1</value>
+			<value>0</value>
+		</row>
+		<row>
+			<value>2</value>
+			<value>1</value>
+		</row>
+		<row>
+			<value>3</value>
+			<value>0</value>
+		</row>
+	</table>
+	<table name="settings">
+        <column>name</column>
+        <column>value</column>
+		<row>
+			<value>theme</value>
+			<value>DefaultTheme</value>
+		</row>
+		<row>
+			<value>admin_theme</value>
+			<value>DefaultTheme</value>
+		</row>
+	</table>
+    <table name="plugin_settings">
+        <column>plugin</column>
+        <column>name</column>
+        <column>value</column>
+	</table>
+	<table name="password">
+        <column>u_id</column>
+        <column>password</column>
+		<row>
+			<value>0</value>
+			<null />
+		</row>
+		<row>
+			<value>1</value>
+			<value>password</value>
+		</row>
+	</table>
+	<table name="articles">
+        <column>a_id</column>
+        <column>title</column>
+        <column>description</column>
+		<column>content</column>
+		<column>u_id</column>
+		<column>date_created</column>
+		<column>date_modified</column>
+		<column>required_permissions</column>
+		<row>
+			<value>0</value>
+			<value>Hello World!</value>
+			<value>Welcome to my website</value>
+			<value>&lt;h1&gt;Hello World!&lt;/h1&gt;&lt;p&gt;This is my website&lt;/p&gt;</value>
+			<value>0</value>
+			<value>1543681181</value>
+			<value>1543681181</value>
+			<value>0</value>
+		</row>
+		<row>
+			<value>1</value>
+			<value>Second test page</value>
+			<value>Another test page</value>
+			<value>&lt;h2&gt;Bye World!&lt;/h2&gt;&lt;p&gt;This is my website &amp;lt;&amp;lt;&lt;/p&gt;</value>
+			<value>0</value>
+			<value>1543681181</value>
+			<value>1543681181</value>
+			<value>0</value>
+		</row>
+		<row>
+			<value>2</value>
+			<value>Third test page</value>
+			<value>Lorem Ipsum</value>
+			<value>&lt;h2&gt;Lorem Ipsum&lt;/h2&gt;&lt;p&gt;Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputate eleifend tellus. Aenean leo ligula, porttitor eu, consequat vitae, eleifend ac, enim. Aliquam lorem ante, dapibus in, viverra quis, feugiat a, tellus. Phasellus viverra nulla ut metus varius laoreet. Quisque rutrum. Aenean imperdiet. Etiam ultricies nisi vel augue. Curabitur ullamcorper ultricies nisi. Nam eget dui.&lt;/p&gt;</value>
+			<value>1</value>
+			<value>1543681181</value>
+			<value>1543681181</value>
+			<value>0</value>
+		</row>
+		<row>
+			<value>3</value>
+			<value>Private test page</value>
+			<value>This page is private</value>
+			<value>&lt;h3&gt;Private world&lt;/h3&gt;&lt;p&gt;This is my private website, only members allowed.&lt;/p&gt;</value>
+			<value>1</value>
+			<value>1543681181</value>
+			<value>1543681181</value>
+			<value>1</value>
+		</row>
+	</table>
+</dataset>
