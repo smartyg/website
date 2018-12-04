@@ -6,9 +6,6 @@ namespace Framework\Exceptions;
 
 abstract class BaseException extends \Exception
 {
-	abstract public function msgCode() : int;
-	abstract public function msgName() : string;
-	abstract public function readableMessage() : string;
 }
 
 /*
