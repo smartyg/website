@@ -50,12 +50,33 @@ final class Api extends Permissions
 		unset($this->query);
 	}
 	
-	public function getRelatedArticles(string $tags = "") : array
+	public function getRelatedArticlesByArticleId(int $id) : array
 	{
 		if($this->checkPerms())
 		{
-			
+			$tags_str = $this->query->getArticleTags($id, $this->session->getPermissions());
+			$tags = explode(',', $tags_str);
+			return $this->getRelatedArticlesByTagIds($tags);
 		}
+		else throw new Exception("Not the right permissions.");
+	}
+	
+	public function getRelatedArticlesByTagIds(array $ids) : array
+	{
+		if($this->checkPerms())
+		{
+			$r = array();
+			foreach($ids as $tag)
+			{
+				$articles = $this->query->getArticlesByTag($tag, $this->session->getPermissions());
+				foreach($articles as $article)
+				{
+					$r[] = new ShortArticle($article);
+				}
+			}
+			return Utils::SortArray($r, '\Framework\Article::compareId');
+		}
+		else throw new Exception("Not the right permissions.");
 	}
 	
 	public function getSubArticles(int $id = 0) : array
