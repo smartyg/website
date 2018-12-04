@@ -4,10 +4,12 @@ declare(strict_types = 1);
 
 namespace Framework;
 
+use Framework\iArraify;
+
 /** Main class for holding user info.
  *
  */
-final class Userdata
+final class Userdata implements iArraify
 {
 	private $u_id = -1;
 	private $first_name;
@@ -29,6 +31,19 @@ final class Userdata
 			if(array_key_exists('email_address', $input)) $this->email_address = $input['email_address'];
 			if(array_key_exists('permissions', $input)) $this->permissions = (int)$input['permissions'];
 		}
+	}
+	
+	public function toArray() : array
+	{
+		return array(
+			'u_id' => $this->u_id,
+			'first_name' => $this->first_name,
+			'middle_name' => $this->middle_name,
+			'last_name' => $this->last_name,
+			'display_name' => $this->display_name,
+			'email_address' => $this->email_address,
+			'permissions' => $this->permissions
+			);
 	}
 	
 	public function isValid() : bool

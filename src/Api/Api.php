@@ -6,10 +6,13 @@ namespace Api;
 
 use Framework\Session;
 use Framework\Theme;
+use Framework\Article;
 use Framework\Meta;
+use Framework\ShortArticle;
 use Framework\Query;
 use Framework\Permissions;
 use Framework\Userdata;
+use Framework\Utils;
 use \PDO;
 
 /** Main class for which contains all api calls.
@@ -59,24 +62,24 @@ final class Api extends Permissions
 	{
 		if($this->checkPerms())
 		{
-			$r = $this->query->getSubArticles($id, $this->session->getPermissions());
-			foreach($r as $v)
+			$articles = $this->query->getSubArticles($id, $this->session->getPermissions());
+			$r = array();
+			foreach($articles as $article)
 			{
-				$ret[] = $v['id'];
+				$r[] = new ShortArticle($article);
 			}
-			return $ret;
+			return $r;
 		}
 	}
 		
-	public function getArticle(int $id) : array
+	public function getArticle(int $id) : Article
 	{
 		if($this->checkPerms())
 		{
-			$r['id'] = $id;
-			$r['content'] = $this->query->getArticle($id, $this->session->getPermissions());
-			$r['meta'] = $this->getArticleMeta($id);
-			$r['title'] = $r['meta']->title;
-			return $r;
+			$r = $this->getArticleMeta($id);
+			$i['content'] = $this->query->getArticle($id, $this->session->getPermissions());
+
+			return Article::extend($r, $i);
 		}
 	}
 	
@@ -84,8 +87,10 @@ final class Api extends Permissions
 	{
 		if($this->checkPerms())
 		{
-			$tags = $this->query->getArticleTags($id, $this->session->getPermissions());
-			return new Meta($this->query->getArticleMeta($id, $this->session->getPermissions()));
+			$meta = $this->query->getArticleMeta($id, $this->session->getPermissions());
+			$tags = explode(',', $this->query->getArticleTags($id, $this->session->getPermissions()));
+			$meta['tags'] = Utils::SortArray($tags, '\Framework\Utils::compareInt');
+			return new Meta($meta);
 		}
 	}
 	
@@ -94,7 +99,12 @@ final class Api extends Permissions
 		if($this->checkPerms())
 		{
 			$sides = $this->query->getSideArticles($id, $this->session->getPermissions());
-			return explode(',', $sides);
+			$r = array();
+			foreach($sides as $side)
+			{
+				$r[] = new ShortArticle($side);
+			}
+			return Utils::SortArray($r, '\Framework\Article::compareId');
 		}
 	}
 	

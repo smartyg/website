@@ -4,27 +4,21 @@ declare(strict_types = 1);
 
 namespace Framework;
 
-use \Framework\ShortArticle;
+use \Framework\Meta;
 use \Framework\Exceptions\InternalException;
 
 /** Main class for managing a (web)page.
  *
  */
-class Meta extends ShortArticle
+class Article extends Meta
 {
-	public $date_created;
-	public $date_modified;
-	public $author;
-	public $tags;
+	public $content;
 
 	function __construct(array $input = null)
 	{
 		if(is_array($input))
 		{
-			if(array_key_exists('date_created', $input)) $this->date_created = $input['date_created'];
-			if(array_key_exists('date_modified', $input)) $this->date_modified = $input['date_modified'];
-			if(array_key_exists('author', $input)) $this->author = $input['author'];
-			if(array_key_exists('tags', $input)) $this->tags = $input['tags'];
+			if(array_key_exists('content', $input)) $this->content = $input['content'];
 			parent::__construct($input);
 		}
 	}
@@ -38,7 +32,8 @@ class Meta extends ShortArticle
 			'date_created' => $this->date_created,
 			'date_modified' => $this->date_modified,
 			'author' => $this->author,
-			'tags' => $this->tags
+			'tags' => $this->tags,
+			'content' => $this->content
 			);
 	}
 
@@ -48,26 +43,11 @@ class Meta extends ShortArticle
 		if(!key_exists('id', $input) || empty($input['id'])) $input['id'] = $article->id;
 		if(!key_exists('title', $input) || empty($input['title'])) $input['title'] = $article->title;
 		if(!key_exists('description', $input) || empty($input['description'])) $input['description'] = $article->description;
-		return new Meta($input);
-	}
-
-	static public function compareAuthor(Meta $a, Meta $b) : int
-	{
-		return strnatcmp($a->author, $b->author);
-	}
-
-	static public function compareCreatedDate(Meta $a, Meta $b) : int
-	{
-		if($a->date_created < $b->date_created) return -1;
-		if($a->date_created > $b->date_created) return 1;
-		else return 0;
-	}
-
-	static public function compareModifiedDate(Meta $a, Meta $b) : int
-	{
-		if($a->date_modified < $b->date_modified) return -1;
-		if($a->date_modified > $b->date_modified) return 1;
-		else return 0;
+		if(!key_exists('date_created', $input) || empty($input['date_created'])) $input['date_created'] = $article->date_created;
+		if(!key_exists('date_modified', $input) || empty($input['date_modified'])) $input['date_modified'] = $article->date_modified;
+		if(!key_exists('author', $input) || empty($input['author'])) $input['author'] = $article->author;
+		if(!key_exists('tags', $input) || empty($input['tags'])) $input['tags'] = $article->tags;
+		return new Article($input);
 	}
 }
 ?>
