@@ -43,10 +43,11 @@ abstract class Permissions
 			{
 				if(!(array_key_exists(3, $call) && array_key_exists('class', $call[3]) && $call[3]['class'] == 'Framework\Session')) return false;
 			}
-			if(array_key_exists(1, $call) && array_key_exists('class', $call[1]) && $call[1]['class'] == 'Framework\Api')
+			elseif(array_key_exists(1, $call) && array_key_exists('class', $call[1]) && $call[1]['class'] == 'Api\Api')
 			{
 				if(!(array_key_exists(2, $call) && array_key_exists('class', $call[2]) && $call[2]['class'] == 'Framework\Session')) return false;
 			}
+			else return false;
 		}
 		return $r;
 	}
