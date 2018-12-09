@@ -77,7 +77,7 @@ class QueryTest extends DatabaseTestCase
 	public function test_InvalidArguments1()
 	{
 		$this->expectException(InternalException::class);
-		$this->expectExceptionCode(InternalException::WRONG_NUM_RECORDS_RETURNED);
+		$this->expectExceptionCode(InternalException::NO_RECORDS_RETURNED);
 		$this->query->getArticle("This is no number", "This is no permission");
 	}
 	
@@ -131,7 +131,7 @@ class QueryTest extends DatabaseTestCase
 	public function test_getArticle3()
 	{
 		$this->expectException(InternalException::class);
-		$this->expectExceptionCode(InternalException::WRONG_NUM_RECORDS_RETURNED);
+		$this->expectExceptionCode(InternalException::NO_RECORDS_RETURNED);
 		$this->query->getArticle(404, $this->session->getPermissions());
 	}
 
@@ -144,7 +144,7 @@ class QueryTest extends DatabaseTestCase
 	public function test_getArticle4()
 	{
 		$this->expectException(InternalException::class);
-		$this->expectExceptionCode(InternalException::WRONG_NUM_RECORDS_RETURNED);
+		$this->expectExceptionCode(InternalException::NO_RECORDS_RETURNED);
 		$this->query->getArticle(PHP_INT_MAX - 1, $this->session->getPermissions());
 	}
 	
@@ -157,7 +157,7 @@ class QueryTest extends DatabaseTestCase
 	public function test_getArticle5()
 	{
 		$this->expectException(InternalException::class);
-		$this->expectExceptionCode(InternalException::WRONG_NUM_RECORDS_RETURNED);
+		$this->expectExceptionCode(InternalException::NO_RECORDS_RETURNED);
 		$this->query->getArticle(PHP_INT_MIN + 1, $this->session->getPermissions());
 	}
 
@@ -229,7 +229,7 @@ class QueryTest extends DatabaseTestCase
 	public function test_getArticleMeta3()
 	{
 		$this->expectException(InternalException::class);
-		$this->expectExceptionCode(InternalException::WRONG_NUM_RECORDS_RETURNED);
+		$this->expectExceptionCode(InternalException::NO_RECORDS_RETURNED);
 		$this->query->getArticleMeta(404, $this->session->getPermissions());
 	}
 
@@ -272,9 +272,9 @@ class QueryTest extends DatabaseTestCase
 	 */
 	public function test_getSubArticles3()
 	{
-		$expected = array();
-		$actual = $this->query->getSubArticles(3, $this->session->getPermissions());
-		$this->assertEquals($expected, $actual);
+		$this->expectException(InternalException::class);
+		$this->expectExceptionCode(InternalException::NO_RECORDS_RETURNED);
+		$this->query->getSubArticles(3, $this->session->getPermissions());
 	}
 	
 	/**
@@ -371,40 +371,6 @@ class QueryTest extends DatabaseTestCase
 	 * @covers \Framework\Query
 	 * @uses \Framework\permissions
 	 * @uses \Framework\Q
-	 *//*
-	public function test_getArticlesByTags1()
-	{
-		$expected = array(
-			array('id' => '0', 'title' => 'Hello World!', 'description' => 'Welcome to my website'),
-			array('id' => '2', 'title' => 'Third test page', 'description' => 'Lorem Ipsum'),
-			array('id' => '3', 'title' => 'Private test page', 'description' => 'This page is private')
-			);
-		$actual = $this->query->getArticlesByTags('0,1', $this->session->getPermissions());
-		$this->assertEquals($expected, $actual);
-	}
-*/
-	/**
-	 * @covers \Framework\Query
-	 * @uses \Framework\permissions
-	 * @uses \Framework\Q
-	 *//*
-	public function test_getArticlesByTags2()
-	{
-		$expected = array(
-			array('id' => '0', 'title' => 'Hello World!', 'description' => 'Welcome to my website'),
-			array('id' => '1', 'title' => 'Second test page', 'description' => 'Another test page'),
-			array('id' => '2', 'title' => 'Third test page', 'description' => 'Lorem Ipsum'),
-			array('id' => '3', 'title' => 'Private test page', 'description' => 'This page is private')
-			);
-		$actual = $this->query->getArticlesByTags('0,1,3,2', $this->session->getPermissions());
-		var_dump($actual);
-		$this->assertEquals($expected, $actual);
-	}
-*/
-	/**
-	 * @covers \Framework\Query
-	 * @uses \Framework\permissions
-	 * @uses \Framework\Q
 	 */
 	public function test_getArticlesByTag1()
 	{
@@ -468,7 +434,7 @@ class QueryTest extends DatabaseTestCase
 	public function test_getSettingValue2()
 	{
 		$this->expectException(InternalException::class);
-		$this->expectExceptionCode(InternalException::WRONG_NUM_RECORDS_RETURNED);
+		$this->expectExceptionCode(InternalException::NO_RECORDS_RETURNED);
 		$this->query->getSettingValue('invalidKey');
 	}
 

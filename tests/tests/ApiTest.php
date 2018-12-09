@@ -2,6 +2,7 @@
 
 use PHPUnit\Framework\TestCase;
 use Api\Api;
+use Api\Exceptions\ApiException;
 use Framework\ShortArticle;
 use Framework\Meta;
 use Framework\Article;
@@ -46,7 +47,7 @@ class ApiTest extends DatabaseTestCase
              ->willReturn(null);
 		$this->api = new Api($stub, $pdo);
 		
-		$articles = array(
+		$this->articles = array(
 			new ShortArticle(array('id' => 0, 'title' => 'Hello World!', 'description' => 'Welcome to my website')),
 			new ShortArticle(array('id' => 1, 'title' => 'Second test page', 'description' => 'Another test page')),
 			new ShortArticle(array('id' => 2, 'title' => 'Third test page', 'description' => 'Lorem Ipsum')),
@@ -130,6 +131,8 @@ class ApiTest extends DatabaseTestCase
 	// test with default value
 	public function test_getSubArticles1()
 	{
+        /* TODO: decide how to return a sub structure. */
+        $this->markTestIncomplete();
 		$expected = array();
 		$actual = $this->api->getSubArticles();
 		$this->assertEquals($expected, $actual);
@@ -144,6 +147,8 @@ class ApiTest extends DatabaseTestCase
 	 */
 	public function test_getSubArticles2()
 	{
+        /* TODO: decide how to return a sub structure. */
+        $this->markTestIncomplete();
 		$expected = array();
 		$actual = $this->api->getSubArticles(1);
 		$this->assertEquals($expected, $actual);
@@ -259,46 +264,55 @@ class ApiTest extends DatabaseTestCase
 	/**
 	 * @covers \Api\Api
 	 * @covers \Framework\Query
+     * @uses \Api\Exceptions\ApiException
+	 * @uses \Framework\Article
 	 * @uses \Framework\Meta
+	 * @uses \Framework\ShortArticle
 	 * @uses \Framework\Permissions
 	 * @uses \Framework\Q
 	 * @uses \Framework\Utils
 	 */
 	public function test_getArticle3()
 	{
-		$expected = array();
-		$actual = $this->api->getArticle(404);
-		$this->assertEquals($expected, $actual);
+		$this->expectException(ApiException::class);
+		$this->expectExceptionCode(ApiException::NO_ARTICLE);
+		$this->api->getArticle(404);
 	}
 	
 	/**
 	 * @covers \Api\Api
 	 * @covers \Framework\Query
+	 * @uses \Api\Exceptions\ApiException
+	 * @uses \Framework\Article
 	 * @uses \Framework\Meta
+	 * @uses \Framework\ShortArticle
 	 * @uses \Framework\Permissions
 	 * @uses \Framework\Q
 	 * @uses \Framework\Utils
 	 */
 	public function test_getArticle4()
 	{
-		$expected = array();
-		$actual = $this->api->getArticle(PHP_INT_MAX - 1);
-		$this->assertEquals($expected, $actual);
+		$this->expectException(ApiException::class);
+		$this->expectExceptionCode(ApiException::NO_ARTICLE);
+		$this->api->getArticle(PHP_INT_MAX - 1);
 	}
 	
 	/**
 	 * @covers \Api\Api
 	 * @covers \Framework\Query
+	 * @uses \Api\Exceptions\ApiException
+	 * @uses \Framework\Article
 	 * @uses \Framework\Meta
+	 * @uses \Framework\ShortArticle
 	 * @uses \Framework\Permissions
 	 * @uses \Framework\Q
 	 * @uses \Framework\Utils
 	 */
 	public function test_getArticle5()
 	{
-		$expected = array();
-		$actual = $this->api->getArticle(PHP_INT_MIN + 1);
-		$this->assertEquals($expected, $actual);
+		$this->expectException(ApiException::class);
+		$this->expectExceptionCode(ApiException::NO_ARTICLE);
+		$this->api->getArticle(PHP_INT_MIN + 1);
 	}
 
 	/**
@@ -306,6 +320,7 @@ class ApiTest extends DatabaseTestCase
 	 * 
 	 * @covers \Api\Api
 	 * @covers \Framework\Query
+	 * @uses \Framework\Article
 	 * @uses \Framework\Meta
 	 * @uses \Framework\ShortArticle
 	 * @uses \Framework\Permissions
@@ -330,6 +345,7 @@ class ApiTest extends DatabaseTestCase
 	 * 
 	 * @covers \Api\Api
 	 * @covers \Framework\Query
+	 * @uses \Framework\Article
 	 * @uses \Framework\Meta
 	 * @uses \Framework\ShortArticle
 	 * @uses \Framework\Permissions
@@ -354,6 +370,8 @@ class ApiTest extends DatabaseTestCase
 	 * 
 	 * @covers \Api\Api
 	 * @covers \Framework\Query
+	 * @uses \Api\Exceptions\ApiException
+	 * @uses \Framework\Article
 	 * @uses \Framework\Meta
 	 * @uses \Framework\ShortArticle
 	 * @uses \Framework\Permissions
@@ -362,16 +380,18 @@ class ApiTest extends DatabaseTestCase
 	 */
 	public function test_getArticleMeta3()
 	{
-		$expected = array();
-		$actual = $this->api->getArticleMeta(404);
-		$this->assertEquals($expected, $actual);
+		$this->expectException(ApiException::class);
+		$this->expectExceptionCode(ApiException::NO_ARTICLE);
+		$this->api->getArticleMeta(404);
 	}
 	
 	/**
 	 * test method getArticleMeta(int $id) : Meta
-	 *
+	 * 
 	 * @covers \Api\Api
 	 * @covers \Framework\Query
+	 * @uses \Api\Exceptions\ApiException
+	 * @uses \Framework\Article
 	 * @uses \Framework\Meta
 	 * @uses \Framework\ShortArticle
 	 * @uses \Framework\Permissions
@@ -380,16 +400,18 @@ class ApiTest extends DatabaseTestCase
 	 */
 	public function test_getArticleMeta4()
 	{
-		$expected = array();
-		$actual = $this->api->getArticleMeta(PHP_INT_MAX - 1);
-		$this->assertEquals($expected, $actual);
+		$this->expectException(ApiException::class);
+		$this->expectExceptionCode(ApiException::NO_ARTICLE);
+		$this->api->getArticleMeta(PHP_INT_MAX - 1);
 	}
 	
 	/**
 	 * test method getArticleMeta(int $id) : Meta
-	 *
+	 * 
 	 * @covers \Api\Api
 	 * @covers \Framework\Query
+	 * @uses \Api\Exceptions\ApiException
+	 * @uses \Framework\Article
 	 * @uses \Framework\Meta
 	 * @uses \Framework\ShortArticle
 	 * @uses \Framework\Permissions
@@ -398,9 +420,9 @@ class ApiTest extends DatabaseTestCase
 	 */
 	public function test_getArticleMeta5()
 	{
-		$expected = array();
-		$actual = $this->api->getArticleMeta(PHP_INT_MIN + 1);
-		$this->assertEquals($expected, $actual);
+		$this->expectException(ApiException::class);
+		$this->expectExceptionCode(ApiException::NO_ARTICLE);
+		$this->api->getArticleMeta(PHP_INT_MIN + 1);
 	}
 
 	/**
@@ -492,6 +514,7 @@ class ApiTest extends DatabaseTestCase
 	{
 		$actual = $this->api->getTheme();
 		$this->assertInstanceOf(\Framework\Theme::class, $actual);
+		$this->assertTrue(get_class($actual) == 'Theme\DefaultTheme', "class " . get_class($actual) . " is not of expected class 'Theme\DefaultTheme'.");
 		return $actual;
 	}
 	
@@ -538,6 +561,8 @@ $this->markTestIncomplete();
 	{
 		$actual = $this->api->getAdminTheme();
 		$this->assertInstanceOf(\Framework\Theme::class, $actual);
+		$this->assertInstanceOf(\Framework\iAdminTheme::class, $actual);
+		$this->assertTrue(get_class($actual) == 'Theme\DefaultTheme', "class " . get_class($actual) . " is not of expected class 'Theme\DefaultTheme'.");
 		return $actual;
 	}
 	

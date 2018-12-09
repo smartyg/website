@@ -123,8 +123,33 @@ class UtilsTest extends TestCase
 		$input = array(1,3,-3424,64,2,3,34,6,546,3,212,5,6,32,0,1,4,6,23,41,43,6,24,2,657,7,5,32,21,4,6,2,5,65,23,35,4,91,47,322,243,2,5,5,2,4,56);
 		$actual = Utils::sortArray($input, '\Framework\Utils::compareInt');
 		$this->assertTrue(self::checkSort($actual));
+		return $actual;
 	}
-	
+
+	/**
+	 * @covers \Framework\Utils::unique
+	 * @uses \Framework\Utils::compareInt
+	 */
+	public function test_unique1()
+	{
+        $input = array(1,1,2,2,2,3,3,3,3,4,6,7,8,9,9);
+        $expected = array(1,2,3,4,6,7,8,9);
+        $actual = Utils::unique($input, '\Framework\Utils::compareInt');
+		$this->assertEquals($expected, $actual);
+	}
+
+	/**
+	 * @covers \Framework\Utils::unique
+	 * @uses \Framework\Utils::compareInt
+	 * @depends test_sortArray1
+	 */
+	public function test_unique2($input)
+	{
+        $expected = array(-3424,0,1,2,3,4,5,6,7,21,23,24,32,34,35,41,43,47,56,64,65,91,212,243,322,546,657);
+        $actual = Utils::unique($input, '\Framework\Utils::compareInt');
+		$this->assertEquals($expected, $actual);
+	}
+
 	/**
 	 * @covers \Framework\Utils::arraify
 	 * @covers \Framework\ShortArticle
@@ -171,7 +196,7 @@ class UtilsTest extends TestCase
 			'date_created' => 34253254,
 			'date_modified' => 4326343,
 			'author' => 'Me, Myself & I',
-			'tags' => '0,4,6'
+			'tags' => array(0,4,6)
 			);
 		$meta = new Meta($input);
 		$expected = $input;
@@ -210,7 +235,7 @@ class UtilsTest extends TestCase
 			'date_created' => 34253254,
 			'date_modified' => 4326343,
 			'author' => 'Me, Myself & I',
-			'tags' => '0,4,6',
+			'tags' => array(0,4,6),
 			'content' => '<h1>Hello World!</h1><p>Lorem Ipsum</p>'
 			);
 		$article = new Article($input);
