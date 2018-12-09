@@ -26,7 +26,7 @@ final class Session
 	private $is_valid = false;
 	private $settings = null;
 	private $use_buffer = true;
-	private $current_article = 1;
+	private $current_article = 0;
 	private $userdata = null;
 	private $user_id;
 
