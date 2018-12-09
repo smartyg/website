@@ -150,7 +150,11 @@ final class Query extends Permissions
 			}
 			elseif(self::hasBitSet($q->options, self::QUERY_RETURN_ARRAY))
 			{
-				if(is_array($res)) return $res;
+				if(is_array($res))
+				{
+                    if(count($res) > 0) return $res;
+                    else throw new InternalException($fn . ": There are no rows in the return array. Review the database statement.", InternalException::NO_RECORDS_RETURNED);
+                }
 				else throw new InternalException($fn . ": The result of the query did not return an array. Review the database statement.", InternalException::WRONG_NUM_RECORDS_RETURNED);
 			}
 			else throw new InternalException('no return type given for query ' . $fn . '.', InternalException::CODE_ERROR);
