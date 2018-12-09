@@ -22,6 +22,7 @@ final class Query extends Permissions
 	private $dbh = null;
 	private $stmt = array();
 	private $methods;
+	private $session;
 
 	/** \fn getArticle($id)
 	 * \brief get article content of given id
@@ -67,6 +68,11 @@ final class Query extends Permissions
 			$this->dbh = $dbh;
 		}
 		else throw new InternalException("No valid session is active, queries not availible.", InternalException::NO_VALID_SESSION);
+	}
+	
+	protected function getSession() : Session
+	{
+        return $this->session;
 	}
 
 	/** Helper method for generic query execution.

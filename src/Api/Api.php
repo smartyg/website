@@ -22,6 +22,7 @@ use \PDO;
 final class Api extends Permissions
 {
 	private $query;
+	private $session;
 
 	/** Constructor to initialize the class.
 	 * Initialize the Api class.
@@ -49,7 +50,12 @@ final class Api extends Permissions
 		// Also remove the link to the Query instance for the garbage collector.
 		unset($this->query);
 	}
-	
+
+	protected function getSession() : Session
+	{
+        return $this->session;
+	}
+
 	public function getRelatedArticlesByArticleId(int $id) : array
 	{
 		if($this->checkPerms())
