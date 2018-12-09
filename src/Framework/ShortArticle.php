@@ -19,9 +19,9 @@ class ShortArticle implements iArraify
 	{
 		if(is_array($input))
 		{
-			if(array_key_exists('id', $input)) $this->id = $input['id'];
-			if(array_key_exists('title', $input)) $this->title = $input['title'];
-			if(array_key_exists('description', $input)) $this->description = $input['description'];
+			if(array_key_exists('id', $input)) $this->id = (int)$input['id'];
+			if(array_key_exists('title', $input)) $this->title = (string)$input['title'];
+			if(array_key_exists('description', $input)) $this->description = (string)$input['description'];
 		}
 	}
 

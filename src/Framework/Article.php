@@ -18,7 +18,7 @@ class Article extends Meta
 	{
 		if(is_array($input))
 		{
-			if(array_key_exists('content', $input)) $this->content = $input['content'];
+			if(array_key_exists('content', $input)) $this->content = (string)$input['content'];
 			parent::__construct($input);
 		}
 	}

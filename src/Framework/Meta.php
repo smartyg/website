@@ -21,10 +21,10 @@ class Meta extends ShortArticle
 	{
 		if(is_array($input))
 		{
-			if(array_key_exists('date_created', $input)) $this->date_created = $input['date_created'];
-			if(array_key_exists('date_modified', $input)) $this->date_modified = $input['date_modified'];
-			if(array_key_exists('author', $input)) $this->author = $input['author'];
-			if(array_key_exists('tags', $input)) $this->tags = $input['tags'];
+			if(array_key_exists('date_created', $input)) $this->date_created = (int)$input['date_created'];
+			if(array_key_exists('date_modified', $input)) $this->date_modified = (int)$input['date_modified'];
+			if(array_key_exists('author', $input)) $this->author = (string)$input['author'];
+			if(array_key_exists('tags', $input)) $this->tags = (array)$input['tags'];
 			parent::__construct($input);
 		}
 	}
