@@ -104,6 +104,19 @@ final class Utils
 		}
 		return $input;
 	}
+	
+	static public function unique(array $input, callable $fn) : array
+	{
+        $c = count($input);
+        for($n = 1; $n < $c; $n++)
+        {
+            if($fn($input[$n], $input[$n - 1]) == 0)
+            {
+                unset($input[$n - 1]);
+            }
+        }
+        return array_values($input);
+	}
 }
 
 ?>
