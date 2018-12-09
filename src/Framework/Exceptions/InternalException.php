@@ -15,8 +15,9 @@ class InternalException extends BaseException
 	const FAILED_TO_EXECUTE = 7;
 	const FAILED_TO_FETCH = 8;
 	const WRONG_NUM_RECORDS_RETURNED = 9;
-	const WRONG_PERMISSION = 10;
-	const ARTICLES_NO_MATCH = 11;
+	const NO_RECORDS_RETURNED = 10;
+	const WRONG_PERMISSION = 11;
+	const ARTICLES_NO_MATCH = 12;
 }
 
 ?>
