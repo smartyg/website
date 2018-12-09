@@ -34,7 +34,7 @@ final class Api extends Permissions
 	{
 		// Check if we were given a valid session, otherwise throw a session exception.
 		if($session->isValid()) $this->session = $session;
-		else throw new SessionException(SessionException::_NO_VALID_SESSION);
+		else throw new SessionException(SessionException::NO_VALID_SESSION);
 		
 		// Create an instance of the Query class to handle all the backend database queries.
 		$this->query = new Query($this->session, $dbh);
@@ -207,7 +207,7 @@ final class Api extends Permissions
 	
 	public function checkPassword(string $username, string $password) : bool
 	{
-		if($this->checkPerms(self::_PREM_ONLY_FRAMEWORK))
+		if($this->checkPerms(self::PREM_ONLY_FRAMEWORK))
 		{
 			if(($check = $this->query->getPassword($username)) == null) return false;
 			if(password_verify($password, $check) === true) return true;
@@ -219,7 +219,7 @@ final class Api extends Permissions
 
 	public function getUserdata(string $username) : Userdata
 	{
-		if($this->checkPerms(self::_PREM_ONLY_FRAMEWORK))
+		if($this->checkPerms(self::PREM_ONLY_FRAMEWORK))
 		{
 			if(is_array(($u = $this->query->getUserdata($username)))) return new Userdata($u);
 			
@@ -229,7 +229,7 @@ final class Api extends Permissions
 	
 	public function getUserdataById(int $id) : Userdata
 	{
-		if($this->checkPerms(self::_PREM_ONLY_FRAMEWORK))
+		if($this->checkPerms(self::PREM_ONLY_FRAMEWORK))
 		{
 			if(is_array(($u = $this->query->getUserdataById($id)))) return new Userdata($u);
 			

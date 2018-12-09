@@ -12,10 +12,10 @@ use \Framework\Session;
  */
 abstract class Permissions
 {
-	const _PREM_NO = 1 << 0;
-	const _PREM_REGISTERED_USER = 1 << 1;
-	const _PREM_ADMIN = 1 << 2;
-	const _PREM_ONLY_FRAMEWORK = 1 << 3;
+	const PERM_NO = 1 << 0;
+	const PERM_REGISTERED_USER = 1 << 1;
+	const PERM_ADMIN = 1 << 2;
+	const PERM_ONLY_FRAMEWORK = 1 << 3;
 
 	abstract protected function getSession() : Session;
 	
@@ -32,9 +32,9 @@ abstract class Permissions
 		if(!is_a($session, 'Framework\Session') || !$session->isValid()) throw new Exception("No valid session is active, API not availible.");
 		else $r = true;
 		
-		if(self::hasBitSet($req, self::_PREM_ADMIN))
+		if(self::hasBitSet($req, self::PERM_ADMIN))
 			if(!$session->isAdmin()) return false;
-		if(self::hasBitSet($req, self::_PREM_ONLY_FRAMEWORK))
+		if(self::hasBitSet($req, self::PERM_ONLY_FRAMEWORK))
 		{
 			// check that the n-th function before is part of the Framework namespace.
 			$call = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 4);
