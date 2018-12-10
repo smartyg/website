@@ -18,6 +18,7 @@ use Framework\Structure;
 use Framework\Utils;
 use Framework\Exceptions\PermissionException;
 use Framework\Exceptions\InternalException;
+use Framework\Exceptions\SessionException;
 
 /** Main class for which contains all api calls.
  * This class contains all api function calls. To use this class it must be linked to a valid instance of a \ref Session class and given a backend database handler.
@@ -420,7 +421,7 @@ final class Api extends Permissions
 			{
 				$this->session->logon($username, $password);
 			}
-			catch(LoginException $e)
+			catch(SessionException $e)
 			{
 				return false;
 			}

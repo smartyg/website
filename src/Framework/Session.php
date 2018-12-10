@@ -4,9 +4,9 @@ declare(strict_types = 1);
 
 namespace Framework;
 
-use Api\Api;
-use Framework\Exceptions\{LoginException, SessionException};
 use \PDO;
+use Api\Api;
+use Framework\Exceptions\SessionException;
 
 /** Main class for managing a user session.
  * This class is the core of the framework, it manage the active session and attached permissions.
@@ -49,7 +49,7 @@ final class Session
 			session_destroy();
 			if($this->use_buffer) ob_end_clean();
 			// Throw a SessionException to indicate that we failed to start a session.
-			throw new SessionException(SessionException::_NO_SESSION_FOUND);
+			throw new SessionException(SessionException::NO_SESSION_FOUND);
 		}
 		elseif(isset($_SESSION[self::_SESSION_SAVE_ID]))
 		{
@@ -88,13 +88,13 @@ final class Session
 	 * Try to log in. Username and password are checked against the storage backed. If succeeded then the new user permissions are active immediately.
 	 * @param $username	The username geven by the user.
 	 * @param $password	Password given by the user.
-	 * @exception	Throws a \ref LoginException if logging in fails.
+	 * @exception	Throws a \ref SessionException if logging in fails.
 	 */
 	public function login(string $username, string $password) : void
 	{
 		if($this->api->checkPassword($username, $password))
 			$this->userdata = $this->api->getUserdata($username);
-		else throw new LoginException(LoginException::_LOGIN_FAILED);
+		else throw new SessionException(SessionException::LOGIN_FAILED);
 	}
 
 	/** Log off from a session.

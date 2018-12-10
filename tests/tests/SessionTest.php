@@ -2,6 +2,7 @@
 
 use PHPUnit\Framework\TestCase;
 use Framework\Session;
+use Framework\Exceptions\SessionException;
 
 class SessionTest extends DatabaseTestCase
 {
