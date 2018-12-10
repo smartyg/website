@@ -82,7 +82,7 @@ final class Query extends Permissions
 	 * An overloading method which is used as a generic method to execute queries given in \ref this->methods.
 	 */
 	public function __call(string $fn, array $arguments = null)
-    {
+	{
 		if(!array_key_exists($fn, $this->methods)) throw new InternalException('Query ' . $fn . ' does not exists.', InternalException::QUERY_NOT_EXISTS);
 		$q = $this->methods[$fn];
 		if($this->checkPerms($q->permissions))
@@ -94,7 +94,10 @@ final class Query extends Permissions
 				try
 				{
 					if(($this->stmt[$fn] = $this->dbh->prepare($q->query)) === false)
+					{
+						/* TODO: use PDO::ErrorInfo() */
 						throw new InternalException($fn . ": Cannot prepare SQL statement: " . $q->query . ".", InternalException::WRONG_SQL);
+					}
 				}
 				catch(PDOException $e)
 				{
