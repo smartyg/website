@@ -64,7 +64,8 @@ abstract class DatabaseTestCase extends TestCase
 				}
 				$v[] = '(' . implode(',', $t) . ')';
 			}
-			$sql = 'INSERT INTO ' . $table_name . ' (' . implode(',', $columns) . ') VALUES ' . implode(',', $v) . ';';
+			$sql = 'INSERT INTO ' . $table_name . ' (`' . implode('`,`', $columns) . '`) VALUES ' . implode(',', $v) . ';';
+
 			$stmt = $pdo->prepare($sql);
 			
 			for($r = 0; $r < $table->getRowCount(); $r++)
