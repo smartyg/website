@@ -5,6 +5,7 @@ declare(strict_types = 1);
 namespace Api\Exceptions;
 
 use Framework\Exceptions\ExternalException;
+use Framework\Exceptions\InternalException;
 
 class ApiException extends ExternalException
 {
