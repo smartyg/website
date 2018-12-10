@@ -90,10 +90,13 @@ final class Session
 	 * @param $password	Password given by the user.
 	 * @exception	Throws a \ref SessionException if logging in fails.
 	 */
-	public function login(string $username, string $password) : void
+	public function login(string $username, string $password) : bool
 	{
 		if($this->api->checkPassword($username, $password))
+		{
 			$this->userdata = $this->api->getUserdata($username);
+			return true;
+		}
 		else throw new SessionException(SessionException::LOGIN_FAILED);
 	}
 

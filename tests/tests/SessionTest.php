@@ -64,23 +64,101 @@ class SessionTest extends DatabaseTestCase
 		$actual = $this->session->getPermissions();
 		$this->assertEquals($expected, $actual);
 	}
-	
+
 	/**
 	 * @covers \Framework\Session
+	 * @covers \Framework\Query
+	 * @covers \Api\Api
+	 * @uses \Framework\Userdata
+	 * @uses \Framework\Permissions
 	 */
-	public function test_logon1()
+	public function test_login1()
 	{
-        $this->markTestIncomplete();
 		$expected = true;
-		$actual = $this->session->login();
+		$actual = $this->session->login('John.Doe@example.org', 'ATestPassword');
 		$this->assertEquals($expected, $actual);
 		
-		return $actual;
+		return $this->session;
 	}
-	
+
 	/**
 	 * @covers \Framework\Session
-	 * @depends test_logon1
+	 * @covers \Framework\Query
+	 * @covers \Api\Api
+	 * @uses \Framework\Userdata
+	 * @uses \Framework\Permissions
+	 * @uses \Framework\Exceptions\SessionException
+	 * @uses \Framework\Exceptions\ExternalException
+	 */
+	public function test_login2()
+	{
+		$this->expectException(SessionException::class);
+		$this->expectExceptionCode(SessionException::LOGIN_FAILED);
+		$this->session->login('John.Doe@example.org', 'AWrongPassport');
+	}
+
+	/**
+	 * @covers \Framework\Session
+	 * @covers \Framework\Query
+	 * @covers \Api\Api
+	 * @uses \Framework\Userdata
+	 * @uses \Framework\Permissions
+	 * @uses \Framework\Exceptions\SessionException
+	 * @uses \Framework\Exceptions\ExternalException
+	 */
+	public function test_login3()
+	{
+		$this->expectException(SessionException::class);
+		$this->expectExceptionCode(SessionException::LOGIN_FAILED);
+		$this->session->login('no.existing.user@example.org', 'ATestPassword');
+	}
+
+	/**
+	 * @covers \Framework\Session
+	 * @covers \Framework\Query
+	 * @covers \Api\Api
+	 * @uses \Framework\Userdata
+	 * @uses \Framework\Permissions
+	 */
+	public function test_loginByApi1()
+	{
+		$expected = true;
+		$actual = $this->session->getApi()->login('John.Doe@example.org', 'ATestPassword');
+		$this->assertEquals($expected, $actual);
+	}
+
+	/**
+	 * @covers \Framework\Session
+	 * @covers \Framework\Query
+	 * @covers \Api\Api
+	 * @uses \Framework\Userdata
+	 * @uses \Framework\Permissions
+	 * @uses \Framework\Exceptions\SessionException
+	 * @uses \Framework\Exceptions\ExternalException
+	 */
+	public function test_loginByApi2()
+	{
+		$this->assertFalse($this->session->getApi()->login('John.Doe@example.org', 'AWrongPassport'));
+	}
+
+	/**
+	 * @covers \Framework\Session
+	 * @covers \Framework\Query
+	 * @covers \Api\Api
+	 * @uses \Framework\Userdata
+	 * @uses \Framework\Permissions
+	 * @uses \Framework\Exceptions\SessionException
+	 * @uses \Framework\Exceptions\ExternalException
+	 */
+	public function test_loginByApi3()
+	{
+		$this->assertFalse($this->session->getApi()->login('no.existing.user@example.org', 'ATestPassword'));
+	}
+
+	/**
+	 * @covers \Framework\Session
+	 * @uses \Framework\Userdata
+	 * @depends test_login1
 	 */
 	public function test_getPermissions2(Session $input)
 	{
@@ -90,10 +168,14 @@ class SessionTest extends DatabaseTestCase
 
 		return $input;
 	}
-	
+
 	/**
 	 * @covers \Framework\Session
-	 * @depends test_logon1
+	 * @covers \Framework\Query
+	 * @covers \Api\Api
+	 * @uses \Framework\Permissions
+	 * @uses \Framework\Userdata
+	 * @depends test_login1
 	 */
 	public function test_logoff(Session $input)
 	{
@@ -102,32 +184,6 @@ class SessionTest extends DatabaseTestCase
 		$expected = 0;
 		$actual = $input->getPermissions();
 		$this->assertEquals($expected, $actual);
-	}
-	
-	/**
-	 * @covers \Framework\Session
-	 * @uses \Framework\Settings
-	 * @uses \Api\Api
-	 */
-	public function test_sessionLoad1()
-	{
-        $this->markTestIncomplete();
-		unset($this->session);
-		self::$session_static = null;
-
-		$input = array(
-		'is_admin' => true,
-		'started_time' => 1544180400,
-		'current_article' => 3,
-		'user_id' => 1
-		);
-		$_SESSION[Session::_SESSION_SAVE_ID] = $input;		
-
-		$session = new Session(Session::_SESSION_NO_NEW, false, null, _TEST_CONFIG_FILE);
-		$this->assertEquals(3, $session->getArticleId());
-		unset($session);
-		$this->assertEquals($input, $_SESSION[Session::_SESSION_SAVE_ID]);
-		
 	}
 }
 ?>

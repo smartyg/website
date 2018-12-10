@@ -419,7 +419,7 @@ final class Api extends Permissions
 		{
 			try
 			{
-				$this->session->logon($username, $password);
+				$this->session->login($username, $password);
 			}
 			catch(SessionException $e)
 			{
