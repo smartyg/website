@@ -4,6 +4,7 @@ declare(strict_types = 1);
 
 namespace Api;
 
+use \PDO;
 use Api\Exceptions\ApiException;
 use Framework\Session;
 use Framework\Theme;
@@ -17,7 +18,6 @@ use Framework\Structure;
 use Framework\Utils;
 use Framework\Exceptions\PermissionException;
 use Framework\Exceptions\InternalException;
-use \PDO;
 
 /** Main class for which contains all api calls.
  * This class contains all api function calls. To use this class it must be linked to a valid instance of a \ref Session class and given a backend database handler.
@@ -43,7 +43,7 @@ final class Api extends Permissions
 		// Create an instance of the Query class to handle all the backend database queries.
 		$this->query = new Query($this->session, $dbh);
 	}
-	
+
 	/**
 	 * Cleanup this instance.
 	 */
@@ -57,7 +57,7 @@ final class Api extends Permissions
 
 	protected function getSession() : Session
 	{
-        return $this->session;
+		return $this->session;
 	}
 
 	public function getRelatedArticlesByArticleId(int $id) : array
@@ -72,7 +72,7 @@ final class Api extends Permissions
 				$articles = $this->getRelatedArticlesByTagIds($tags);
 				for($n = 0; $n < count($articles); $n++)
 				{
-                    if($articles[$n]->id == $id) unset($articles[$n]);
+					if($articles[$n]->id == $id) unset($articles[$n]);
 				}
 				return array_values($articles);
 			}
@@ -86,7 +86,7 @@ final class Api extends Permissions
 		}
 		else throw new PermissionException(__METHOD__, $req_permissions);
 	}
-	
+
 	public function getRelatedArticlesByTagIds(array $ids) : array
 	{
 		$req_permissions = self::PERM_NO;
@@ -149,9 +149,9 @@ final class Api extends Permissions
 				if($id >= 0) $top = new ShortArticle($this->query->getArticleMeta($id, $this->session->getPermissions()));
 				else $top = null;
 
-                $structure = new Structure($top);
-                $structure = $this->getSubArticlesInternal($structure, $depth - 1);
-                return $structure;
+				$structure = new Structure($top);
+				$structure = $this->getSubArticlesInternal($structure, $depth - 1);
+				return $structure;
 			}
 			catch(InternalException $e)
 			{
@@ -179,14 +179,14 @@ final class Api extends Permissions
 			catch(InternalException $e)
 			{
 				if($e->getCode() == InternalException::NO_RECORDS_RETURNED)
-					throw new ApiException(__METHOD__, null, ApiException::NO_ARTICLE);
+					throw new ApiException(__METHOD__, $e, ApiException::NO_ARTICLE);
 				else
 					throw new ApiException(__METHOD__, $e);
 			}
 		}
 		else throw new PermissionException(__METHOD__, $req_permissions);
 	}
-	
+
 	public function getArticleMeta(int $id) : Meta
 	{
 		$req_permissions = self::PERM_NO;
@@ -213,7 +213,7 @@ final class Api extends Permissions
 		}
 		else throw new PermissionException(__METHOD__, $req_permissions);
 	}
-	
+
 	/* TODO */
 	public function getSideArticles(int $id) : array
 	{
@@ -230,19 +230,19 @@ final class Api extends Permissions
 		}
 		else throw new PermissionException(__METHOD__, $req_permissions);
 	}
-	
+
 	public function getActivePlugins() : array
 	{
 	}
-	
+
 	public function getAllPlugins() : array
 	{
 	}
-	
+
 	public function getSessionData() : array
 	{
 	}
-	
+
 	public function getTheme() : Theme
 	{
 		$req_permissions = self::PERM_NO;
@@ -262,7 +262,7 @@ final class Api extends Permissions
 		}
 		else throw new PermissionException(__METHOD__, $req_permissions);
 	}
-	
+
 	public function getAllThemes() : array
 	{
 		$files = scandir('./Theme');
@@ -277,7 +277,7 @@ final class Api extends Permissions
 		}
 		return $r;
 	}
-	
+
 	public function getAdminTheme() : Theme
 	{
 		$req_permissions = self::PERM_NO;
@@ -297,7 +297,7 @@ final class Api extends Permissions
 		}
 		else throw new PermissionException(__METHOD__, $req_permissions);
 	}
-	
+
 	public function getAllAdminThemes() : array
 	{
 		$files = scandir('./Theme');
@@ -312,40 +312,41 @@ final class Api extends Permissions
 		}
 		return $r;
 	}
-	
+
 	public function hasAdminTheme(Theme $theme) : bool
 	{
-        $interface_name = 'Framework\iAdminTheme';
+		$interface_name = 'Framework\iAdminTheme';
 		$v = class_implements($theme);
 		if(array_key_exists($interface_name, $v) && $v[$interface_name] == $interface_name) return true;
+		//var_dump($v);
 		return false;
 	}
-	
+
 	public function getThemeNumberSides(Theme $theme) : int
 	{
 		return 0;
 	}
-	
+
 	public function getThemeSettings(Theme $theme) : array
 	{
 	}
-	
+
 	public function setThemeSettings(Theme $theme, array $settings) : void
 	{
 	}
-	
+
 	public function addArticle(string $article, Meta $meta) : int
 	{
 	}
-	
+
 	public function removeArticle(int $id) : bool
 	{
 	}
-	
+
 	public function changeArticle(int $id, string $article, Meta $meta) : bool
 	{
 	}
-	
+
 	public function checkPassword(string $username, string $password) : bool
 	{
 		$req_permissions = self::PERM_ONLY_FRAMEWORK;
@@ -367,6 +368,7 @@ final class Api extends Permissions
 		}
 		else throw new PermissionException(__METHOD__, $req_permissions);
 	}
+
 	public function getUserdata(string $username) : Userdata
 	{
 		$req_permissions = self::PERM_ONLY_FRAMEWORK;
@@ -387,7 +389,7 @@ final class Api extends Permissions
 		}
 		else throw new PermissionException(__METHOD__, $req_permissions);
 	}
-	
+
 	public function getUserdataById(int $id) : Userdata
 	{
 		$req_permissions = self::PERM_ONLY_FRAMEWORK;
@@ -408,7 +410,7 @@ final class Api extends Permissions
 		}
 		else throw new PermissionException(__METHOD__, $req_permissions);
 	}
-	
+
 	public function login(string $username, string $password) : bool
 	{
 		$req_permissions = self::PERM_NO;
