@@ -27,10 +27,9 @@
 		</whitelist>
 	</filter>
 	<logging>
-		<log type="coverage-html" target="build/coverage" title="My website"
-		     charset="UTF-8" yui="true" highlight="true"
+		<log type="coverage-html" target="build/coverage"
 		     lowUpperBound="35" highLowerBound="70" />
-		<log type="junit" target="build/logs/junit.xml" logIncompleteSkipped="false" />
+		<log type="junit" target="build/logs/junit.xml" />
 		<log type="coverage-text" target="php://stdout" />
 	</logging>
 </phpunit>
