@@ -6,6 +6,7 @@ use Api\Exceptions\ApiException;
 use Framework\ShortArticle;
 use Framework\Meta;
 use Framework\Article;
+use Framework\Structure;
 
 class ApiTest extends DatabaseTestCase
 {
@@ -127,13 +128,17 @@ class ApiTest extends DatabaseTestCase
 	 * @uses \Framework\Permissions
 	 * @uses \Framework\Q
 	 * @uses \Framework\ShortArticle
+	 * @uses \Framework\Structure
 	 */
 	// test with default value
 	public function test_getSubArticles1()
 	{
-        /* TODO: decide how to return a sub structure. */
-        $this->markTestIncomplete();
-		$expected = array();
+		$expected = new Structure(null);
+		$l2 = $expected->addChild($this->articles[0]);
+		$l2->addChild($this->articles[3]);
+		$l2->addChild($this->articles[1])->addChild($this->articles[2]);
+
+		//request all articles from the top
 		$actual = $this->api->getSubArticles();
 		$this->assertEquals($expected, $actual);
 	}
@@ -144,13 +149,15 @@ class ApiTest extends DatabaseTestCase
 	 * @uses \Framework\Permissions
 	 * @uses \Framework\Q
 	 * @uses \Framework\ShortArticle
+	 * @uses \Framework\Structure
 	 */
 	public function test_getSubArticles2()
 	{
-        /* TODO: decide how to return a sub structure. */
-        $this->markTestIncomplete();
-		$expected = array();
-		$actual = $this->api->getSubArticles(1);
+		$expected = new Structure($this->articles[0]);
+		$expected->addChild($this->articles[3]);
+		$expected->addChild($this->articles[1]);
+
+		$actual = $this->api->getSubArticles(0, 1);
 		$this->assertEquals($expected, $actual);
 	}
 
@@ -160,40 +167,43 @@ class ApiTest extends DatabaseTestCase
 	 * @uses \Framework\Permissions
 	 * @uses \Framework\Q
 	 * @uses \Framework\ShortArticle
+	 * @uses \Framework\Structure 
 	 */
 	public function test_getSubArticles3()
 	{
-		$expected = array();
-		$actual = $this->api->getSubArticles(3);
+		$expected = new Structure($this->articles[3]);
+		$actual = $this->api->getSubArticles(3, 2);
 		$this->assertEquals($expected, $actual);
 	}
 
 	/** Test with an non-existing value
 	 * @covers \Api\Api
 	 * @covers \Framework\Query
+	 * @uses \Api\Exceptions\ApiException
 	 * @uses \Framework\Permissions
 	 * @uses \Framework\Q
 	 * @uses \Framework\ShortArticle
 	 */
 	public function test_getSubArticles4()
 	{
-		$expected = array();
-		$actual = $this->api->getSubArticles(404);
-		$this->assertEquals($expected, $actual);
+		$this->expectException(ApiException::class);
+		$this->expectExceptionCode(ApiException::NO_ARTICLE);
+		$this->api->getSubArticles(404);
 	}
 
 	/** Test with a non existing huge value
 	 * @covers \Api\Api
 	 * @covers \Framework\Query
+	 * @uses \Api\Exceptions\ApiException
 	 * @uses \Framework\Permissions
 	 * @uses \Framework\Q
 	 * @uses \Framework\ShortArticle
 	 */
 	public function test_getSubArticles5()
 	{
-		$expected = array();
-		$actual = $this->api->getSubArticles(PHP_INT_MAX - 1);
-		$this->assertEquals($expected, $actual);
+		$this->expectException(ApiException::class);
+		$this->expectExceptionCode(ApiException::NO_ARTICLE);
+		$this->api->getSubArticles(PHP_INT_MAX - 1);
 	}
 
 	/** Test with an non existing huge negative value
@@ -202,10 +212,15 @@ class ApiTest extends DatabaseTestCase
 	 * @uses \Framework\Permissions
 	 * @uses \Framework\Q
 	 * @uses \Framework\ShortArticle
+	 * @uses \Framework\Structure
 	 */
 	public function test_getSubArticles6()
 	{
-		$expected = array();
+		$expected = new Structure(null);
+		$l2 = $expected->addChild($this->articles[0]);
+		$l2->addChild($this->articles[3]);
+		$l2->addChild($this->articles[1])->addChild($this->articles[2]);
+
 		$actual = $this->api->getSubArticles(PHP_INT_MIN + 1);
 		$this->assertEquals($expected, $actual);
 	}

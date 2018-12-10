@@ -13,6 +13,7 @@ use Framework\ShortArticle;
 use Framework\Query;
 use Framework\Permissions;
 use Framework\Userdata;
+use Framework\Structure;
 use Framework\Utils;
 use Framework\Exceptions\PermissionException;
 use Framework\Exceptions\InternalException;
@@ -114,33 +115,55 @@ final class Api extends Permissions
 		}
 		else throw new PermissionException(__METHOD__, $req_permissions);
 	}
-	
-	public function getSubArticles(int $id = 0) : array
+
+	private function getSubArticlesInternal(Structure $structure, int $depth) : Structure
+	{
+		try
+		{
+			if($structure->getArticle() != null) $articles = $this->query->getSubArticles($structure->getArticle()->id, $this->session->getPermissions());
+			else $articles = $this->query->getSubArticlesTop($this->session->getPermissions());
+			foreach($articles as $article)
+			{
+				$child = $structure->addChild(new ShortArticle($article), (int)$article['order']);
+				if($depth != 0) $this->getSubArticlesInternal($child, $depth - 1);
+			}
+		}
+		catch(InternalException $e)
+		{
+			if($e->getCode() != InternalException::NO_RECORDS_RETURNED)
+				throw new ApiException(__METHOD__, $e); //TODO: should throw the function name of the original API method 'getSubArticles'
+		}
+		return $structure;
+	}
+
+	/**
+	 * @param depth	Number of children to look for (1 = only find direct children of given article; 0 = find all)
+	 */
+	public function getSubArticles(int $id = -1, int $depth = 0) : Structure
 	{
 		$req_permissions = self::PERM_NO;
 		if($this->checkPerms($req_permissions))
 		{
 			try
 			{
-				$articles = $this->query->getSubArticles($id, $this->session->getPermissions());
-				$r = array();
-				foreach($articles as $article)
-				{
-					$r[] = new ShortArticle($article);
-				}
-				return $r;
+				if($id >= 0) $top = new ShortArticle($this->query->getArticleMeta($id, $this->session->getPermissions()));
+				else $top = null;
+
+                $structure = new Structure($top);
+                $structure = $this->getSubArticlesInternal($structure, $depth - 1);
+                return $structure;
 			}
 			catch(InternalException $e)
 			{
 				if($e->getCode() == InternalException::NO_RECORDS_RETURNED)
-					return array();
+					throw new ApiException(__METHOD__, $e, ApiException::NO_ARTICLE);
 				else
 					throw new ApiException(__METHOD__, $e);
 			}
 		}
 		else throw new PermissionException(__METHOD__, $req_permissions);
 	}
-		
+
 	public function getArticle(int $id) : Article
 	{
 		$req_permissions = self::PERM_NO;

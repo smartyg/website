@@ -242,13 +242,13 @@ class QueryTest extends DatabaseTestCase
 	public function test_getSubArticles1()
 	{
 		$expected = array(
-			array('id' => '1', 'title' => 'Second test page', 'description' => 'Another test page'),
-			array('id' => '3', 'title' => 'Private test page', 'description' => 'This page is private')
+			array('id' => '3', 'title' => 'Private test page', 'description' => 'This page is private', 'order' => '3'),
+			array('id' => '1', 'title' => 'Second test page', 'description' => 'Another test page', 'order' => '5')
 			);
 		$actual = $this->query->getSubArticles(0, $this->session->getPermissions());
 		$this->assertEquals($expected, $actual);
 	}
-	
+
 	/**
 	 * Test getSubArticles query
 	 * @covers \Framework\Query
@@ -258,12 +258,12 @@ class QueryTest extends DatabaseTestCase
 	public function test_getSubArticles2()
 	{
 		$expected = array(
-			array('id' => '2', 'title' => 'Third test page', 'description' => 'Lorem Ipsum')
+			array('id' => '2', 'title' => 'Third test page', 'description' => 'Lorem Ipsum', 'order' => '2')
 			);
 		$actual = $this->query->getSubArticles(1, $this->session->getPermissions());
 		$this->assertEquals($expected, $actual);
 	}
-	
+
 	/**
 	 * Test getSubArticles query
 	 * @covers \Framework\Query
@@ -276,7 +276,22 @@ class QueryTest extends DatabaseTestCase
 		$this->expectExceptionCode(InternalException::NO_RECORDS_RETURNED);
 		$this->query->getSubArticles(3, $this->session->getPermissions());
 	}
-	
+
+    /**
+	 * Test getSubArticles query
+	 * @covers \Framework\Query
+	 * @uses \Framework\permissions
+	 * @uses \Framework\Q
+	 */
+	public function test_getSubArticlesTop()
+	{
+		$expected = array(
+			array('id' => '0', 'title' => 'Hello World!', 'description' => 'Welcome to my website', 'order' => '0')
+			);
+		$actual = $this->query->getSubArticlesTop($this->session->getPermissions());
+		$this->assertEquals($expected, $actual);
+	}
+
 	/**
 	 * @covers \Framework\Query
 	 * @uses \Framework\permissions
