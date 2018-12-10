@@ -43,7 +43,7 @@ class SessionTest extends DatabaseTestCase
 		$actual = $this->session->getArticleId();
 		$this->assertEquals($expected, $actual);
 	}
-	
+
 	/**
 	 * @covers \Framework\Session
 	 */
@@ -53,7 +53,7 @@ class SessionTest extends DatabaseTestCase
 		$actual = $this->session->isValid();
 		$this->assertEquals($expected, $actual);
 	}
-	
+
 	/**
 	 * @covers \Framework\Session
 	 * @uses \Framework\userdata

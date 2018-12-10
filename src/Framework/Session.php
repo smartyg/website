@@ -66,7 +66,7 @@ final class Session
 
 		// Get an instance of the Api class and pass this session as argument, so it will uses our premissions to execute calls. As we did not yet retreive the user data of the current user id, all permissions will still be zero.
 		$this->api = new Api($this, $this->connectDB());
-		
+
 		// Now we have an Api, read the user data assoiciated with the current user ID, this includes reading the premissions.
 		$this->userdata = $this->api->getUserdataById($this->user_id);
 	}
@@ -119,7 +119,7 @@ final class Session
 	{
 		return $this->current_article;	
 	}
-	
+
 	/**
 	 * Save the current content of the class instance to the $_SESSION variable.
 	 */
@@ -132,7 +132,7 @@ final class Session
 		}
 		$_SESSION[self::_SESSION_SAVE_ID] = $s;
 	}
-	
+
 	/**
 	 * Load the associate array given as a paramater into this instance.
 	 * @param $data		An associative array with at least fields that maches then names in Session::$saved_vars
@@ -144,7 +144,7 @@ final class Session
 			if(isset($data[$var])) $this->{$var} = $data[$var];
 		}
 	}
-	
+
 	/**
 	 * Return the associative instance of the api for this session.
 	 * @return	An instance of the Api class for this session.
@@ -153,7 +153,7 @@ final class Session
 	{
 		return $this->api;
 	}
-	
+
 	/** Cleans the current session output buffer.
 	 * Cleans the current session output buffer. All currently buffered output is discarded and the buffer is empty again.
 	 */
@@ -161,7 +161,7 @@ final class Session
 	{
 		if($this->use_buffer) ob_clean();
 	}
-	
+
 	/** Flush the current session output buffer.
 	 * Flush the current session output buffer. All currently buffered output is end to the client and the buffer is empty again.
 	 */
@@ -177,7 +177,7 @@ final class Session
 	{
 		return $this->is_valid;
 	}
-	
+
 	/** Check if this session is an admin session.
 	 * @return	Returns true is this is an admin session and false otherwise.
 	 */
@@ -186,7 +186,7 @@ final class Session
 	/* TODO: link this to the user permissions */
 		return ($this->is_valid && $this->is_admin);
 	}
-	
+
 	/** Connect to backend database.
 	 * This function reads the database settings from the settings file, connects to the database and return the connection handler.
 	 * @return	A valid connection handler.
@@ -196,7 +196,7 @@ final class Session
 		$db = $this->settings->getSettingValue("db");
 		if($db != null) return new PDO($db);
 	}
-	
+
 	/** Get current sessions permissions.
 	 * Get the permissions of the current active session.
 	 * @return	An integer which holds all the active permissions bits.

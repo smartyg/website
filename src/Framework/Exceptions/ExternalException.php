@@ -6,7 +6,6 @@ namespace Framework\Exceptions;
 
 abstract class ExternalException extends BaseException
 {
-
 }
 
 ?>
